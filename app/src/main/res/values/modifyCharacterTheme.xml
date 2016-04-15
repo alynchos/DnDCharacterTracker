@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="modifyCharacterTheme" parent="@android:style/Theme.Dialog">
+        <item name="android:textColor">#A3A3A3</item>
+    </style>
+</resources>

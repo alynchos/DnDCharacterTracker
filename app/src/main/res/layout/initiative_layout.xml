@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/light_grey">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/value_initiative"
+        android:text="0"
+        android:layout_gravity="center"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_initiative"
+        android:text="Initiative"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:textSize="20dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:id="@+id/button_modify_initiative"
+        android:text="Modify"
+        android:textSize="12dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"/>
+
+</LinearLayout>

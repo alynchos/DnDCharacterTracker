@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/tan">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/inv_money_layout"
+        android:layout_alignParentLeft="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:id="@+id/inv_c_amount"
+            android:text=" "
+            android:textColor="@color/copper"
+            android:textStyle="bold"
+            android:textSize="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:id="@+id/inv_s_amount"
+            android:text=" "
+            android:textColor="@color/silver"
+            android:textSize="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:id="@+id/inv_e_amount"
+            android:text=" "
+            android:textColor="@color/electrum"
+            android:textStyle="bold"
+            android:textSize="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:id="@+id/inv_g_amount"
+            android:text=" "
+            android:textColor="@color/gold"
+            android:textStyle="bold"
+            android:textSize="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:id="@+id/inv_p_amount"
+            android:text=" "
+            android:textColor="@color/platinum"
+            android:textStyle="bold"
+            android:textSize="16dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/inv_carry_layout"
+        android:layout_alignParentRight="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:id="@+id/inv_carry_label"
+            android:text="Carry Weight"
+            android:textColor="@color/black"
+            android:layout_marginRight="10dp"
+            android:textStyle="bold"
+            android:textSize="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:id="@+id/inv_carry_curr"
+            android:text="0"
+            android:textColor="@color/black"
+            android:layout_marginRight="5dp"
+            android:textStyle="bold"
+            android:textSize="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:id="@+id/inv_carry_max"
+            android:text="/ 0"
+            android:textColor="@color/black"
+            android:layout_marginRight="10dp"
+            android:textStyle="bold"
+            android:textSize="16dp"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

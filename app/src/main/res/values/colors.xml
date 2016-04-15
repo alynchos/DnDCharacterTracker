@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="light_tan">#F0E0B2</color>
+    <color name="tan">#CC9900</color>
+    <color name="light_blue">#6699FF</color>
+    <color name="light_grey">#BFBFBF</color>
+    <color name="light_yellow">#FFE066</color>
+    <color name="light_brown">#AD855C</color>
+    <color name="soft_red">#CC2900</color>
+    <!-- Currency Colors -->
+    <color name="copper">#000000</color>
+    <color name="silver">#CCCCCC</color>
+    <color name="electrum">#B8DBFF</color>
+    <color name="gold">#FFD119</color>
+    <color name="platinum">#E6E6E6</color>
+
+</resources>

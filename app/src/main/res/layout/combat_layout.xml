@@ -1,0 +1,100 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.dnd.alynchos.dndcharactertracker.Character.CombatActivity"
+    android:background="@color/light_tan">
+
+    <!-- Armor -->
+    <include layout="@layout/armor_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:id="@+id/include_armor_layout"
+        android:layout_alignParentLeft="true"/>
+
+    <!-- Initiative -->
+    <include layout="@layout/initiative_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:id="@+id/include_initiative_layout"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Speed -->
+    <include layout="@layout/speed_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:id="@+id/include_speed_layout"
+        android:layout_alignParentRight="true"/>
+
+    <!-- Weapon Equip -->
+    <include layout="@layout/weapon_equip_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/include_weapon_layout"
+        android:layout_below="@+id/include_armor_layout"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Ammo -->
+    <include layout="@layout/ammo_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/include_ammo_layout"
+        android:layout_below="@+id/include_weapon_layout"
+        android:layout_centerHorizontal="true"/>
+    <Button
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/button_add_ammo"
+        android:text="+"
+        android:textSize="16dp"
+        android:layout_toRightOf="@+id/button_subtract_ammo"
+        android:layout_below="@+id/include_ammo_layout"
+        android:layout_marginTop="-13dp"
+        android:layout_marginLeft="15dp"/>
+    <Button
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/button_subtract_ammo"
+        android:text="-"
+        android:textSize="16dp"
+        android:layout_below="@+id/include_ammo_layout"
+        android:layout_marginTop="-13dp"
+        android:layout_marginLeft="-5dp"/>
+
+    <!-- Health -->
+    <include layout="@layout/health_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/include_ammo_layout"
+        android:id="@+id/include_health_layout"
+        android:layout_centerHorizontal="true"/>
+    <Button
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/button_add_health"
+        android:text="+"
+        android:textSize="16dp"
+        android:layout_toRightOf="@id/include_health_layout"
+        android:layout_below="@+id/include_ammo_layout"
+        android:layout_alignTop="@+id/include_health_layout"/>
+    <Button
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/button_subtract_health"
+        android:text="-"
+        android:textSize="16dp"
+        android:layout_toRightOf="@id/include_health_layout"
+        android:layout_alignBottom="@+id/include_health_layout"
+        android:layout_marginTop="6dp"/>
+
+</RelativeLayout>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_inventory_name"
+        android:hint="name"
+        android:layout_margin="2dp"
+        android:inputType="textImeMultiLine"
+        android:imeOptions="actionNext"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_inventory_amount"
+        android:hint="amount"
+        android:layout_margin="2dp"
+        android:inputType="number"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_inventory_weight"
+        android:hint="weight"
+        android:layout_margin="2dp"
+        android:inputType="numberDecimal"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_inventory_gold"
+        android:hint="gold value"
+        android:layout_margin="2dp"
+        android:inputType="numberDecimal"
+        android:imeOptions="actionDone"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="**Below entries are for weapons only**"
+        android:background="@color/light_blue"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:gravity="center"/>
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_inventory_dice_num"
+        android:hint="number of dice"
+        android:layout_margin="2dp"
+        android:inputType="number"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_inventory_dice_size"
+        android:hint="size of dice"
+        android:layout_margin="2dp"
+        android:inputType="number"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_inventory_flat_dam"
+        android:hint="base damage"
+        android:layout_margin="2dp"
+        android:inputType="number"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_inventory_range"
+        android:hint="range"
+        android:layout_margin="2dp"
+        android:inputType="number"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_inventory_dam_type"
+        android:hint="damage type"
+        android:layout_margin="2dp"
+        android:inputType="textImeMultiLine"
+        android:imeOptions="actionDone"/>
+
+</LinearLayout>
