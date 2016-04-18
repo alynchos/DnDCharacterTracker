@@ -11,9 +11,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -94,18 +97,19 @@ public class CharacterSheetActivity extends Activity implements View.OnClickList
         mRace = (TextView) findViewById(R.id.char_race);
         mAlign = (TextView) findViewById(R.id.char_alignment);
         // Abilities
-        mTextViewAbility[0] = (TextView) findViewById(R.id.stat_ability_strength);
-        mTextViewAbilityMod[0] = (TextView) findViewById(R.id.mod_ability_strength);
-        mTextViewAbility[1] = (TextView) findViewById(R.id.stat_ability_dexterity);
-        mTextViewAbilityMod[1] = (TextView) findViewById(R.id.mod_ability_dexterity);
-        mTextViewAbility[2] = (TextView) findViewById(R.id.stat_ability_constitution);
-        mTextViewAbilityMod[2] = (TextView) findViewById(R.id.mod_ability_constitution);
-        mTextViewAbility[3] = (TextView) findViewById(R.id.stat_ability_intelligence);
-        mTextViewAbilityMod[3] = (TextView) findViewById(R.id.mod_ability_intelligence);
-        mTextViewAbility[4] = (TextView) findViewById(R.id.stat_ability_wisdom);
-        mTextViewAbilityMod[4] = (TextView) findViewById(R.id.mod_ability_wisdom);
-        mTextViewAbility[5] = (TextView) findViewById(R.id.stat_ability_charisma);
-        mTextViewAbilityMod[5] = (TextView) findViewById(R.id.mod_ability_charisma);
+        LinearLayout layout_stats = (LinearLayout) findViewById(R.id.layout_stats);
+        mTextViewAbility[0] = (TextView) layout_stats.findViewById(R.id.include_ability_strength).findViewById(R.id.stat_ability_num);
+        mTextViewAbilityMod[0] = (TextView) layout_stats.findViewById(R.id.include_ability_strength).findViewById(R.id.mod_ability_num);
+        mTextViewAbility[1] = (TextView) layout_stats.findViewById(R.id.include_ability_dexterity).findViewById(R.id.stat_ability_num);
+        mTextViewAbilityMod[1] = (TextView) layout_stats.findViewById(R.id.include_ability_dexterity).findViewById(R.id.mod_ability_num);
+        mTextViewAbility[2] = (TextView) layout_stats.findViewById(R.id.include_ability_constitution).findViewById(R.id.stat_ability_num);
+        mTextViewAbilityMod[2] = (TextView) layout_stats.findViewById(R.id.include_ability_constitution).findViewById(R.id.mod_ability_num);
+        mTextViewAbility[3] = (TextView) layout_stats.findViewById(R.id.include_ability_intelligence).findViewById(R.id.stat_ability_num);
+        mTextViewAbilityMod[3] = (TextView) layout_stats.findViewById(R.id.include_ability_intelligence).findViewById(R.id.mod_ability_num);
+        mTextViewAbility[4] = (TextView) layout_stats.findViewById(R.id.include_ability_wisdom).findViewById(R.id.stat_ability_num);
+        mTextViewAbilityMod[4] = (TextView) layout_stats.findViewById(R.id.include_ability_wisdom).findViewById(R.id.mod_ability_num);
+        mTextViewAbility[5] = (TextView) layout_stats.findViewById(R.id.include_ability_charisma).findViewById(R.id.stat_ability_num);
+        mTextViewAbilityMod[5] = (TextView) layout_stats.findViewById(R.id.include_ability_charisma).findViewById(R.id.mod_ability_num);
         // Skills
         mSkillProfs[0] = (CheckBox) findViewById(R.id.char_acrobatics);
         mSkillProfs[1] = (CheckBox) findViewById(R.id.char_animal_handling);
@@ -162,7 +166,7 @@ public class CharacterSheetActivity extends Activity implements View.OnClickList
         // Experience
         mProgressExperience = (ProgressBar) findViewById(R.id.prog_current_exp);
         mProgressExperience.setMax(CharacterManager.LEVEL_CAPS[0]);
-        mCurrentLevel = (TextView) findViewById(R.id.text_current_level);
+        //mCurrentLevel = (TextView) findViewById(R.id.text_current_level);
 
         CharacterManager characterManager = CharacterManager.getInstance();
         if (characterManager.getCharacter() == null) {

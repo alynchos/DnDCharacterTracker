@@ -1,47 +1,49 @@
 package com.dnd.alynchos.dndcharactertracker;
 
-import android.app.TabActivity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.TabHost;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dnd.alynchos.dndcharactertracker.Character.CharacterManager;
-import com.dnd.alynchos.dndcharactertracker.Character.CharacterSheetActivity;
-import com.dnd.alynchos.dndcharactertracker.Character.CombatActivity;
-import com.dnd.alynchos.dndcharactertracker.Character.NotesActivity;
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
-import com.dnd.alynchos.dndcharactertracker.Items.InventoryActivity;
 import com.dnd.alynchos.dndcharactertracker.SaveData.FeedReaderDbHelper;
 
 /**
  * Created by Alex Lynchosky on 12/22/2014.
  */
-public class DnDTabBarActivity extends TabActivity {
+public class DnDTabBarActivity extends Activity implements View.OnClickListener {
 
     /* Debugging */
     private static final String TAG    = DnDTabBarActivity.class.getSimpleName();
     private static final Logger logger = new Logger(TAG);
 
-    /* Main Tab */
+    /* Main Activity */
     private static DnDTabBarActivity dndTabBarActivity;
 
     private Resources mResources;
-    private TabHost mTabHost;
 
-    /* Tab Names */
-    private final String TAB_CHARACTER      = "character";
-    private final String TAB_INVENTORY      = "inventory";
-    private final String TAB_COMBAT         = "combat";
-    private final String TAB_NOTES         = "notes";
+    /* Hamburger Menu */
+    private ListView mHamburgerList;
+    private DrawerLayout mHamburgerLayout;
+    private ActionBarDrawerToggle mHamburgerToggle;
+    private ArrayAdapter<String> mHamburgerAdapter;
+
+    /* Menu HUD */
+    private RelativeLayout mRelativeLayoutMenuHUD;
+    private ImageButton mButtonHamburgerMenu;
+    private TextView mTextViewTitle;
 
     /* Save Data */
     private static FeedReaderDbHelper feedReaderDbHelper;
@@ -51,6 +53,7 @@ public class DnDTabBarActivity extends TabActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         logger.debug("onCreate called");
+        setContentView(R.layout.main);
 
         // Prevent launching the main activity on top of other activities
         // This will ensure we only have one instance displayed
@@ -68,56 +71,31 @@ public class DnDTabBarActivity extends TabActivity {
         dndTabBarActivity = this;
         FeedReaderDbHelper.setContext(getApplicationContext());
         feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        mTabHost = getTabHost();
 
-        mResources = getResources();
-        /* Insert Tabs */
-        mTabHost.addTab(mTabHost.newTabSpec(TAB_CHARACTER)
-                .setIndicator(getString(R.string.tab_header_character))
-                .setContent(new Intent(dndTabBarActivity, CharacterSheetActivity.class)));
-        TextView x = (TextView) mTabHost.getTabWidget().getChildAt(0).findViewById(android.R.id.title);
-        x.setTextSize(11);
-        mTabHost.getTabWidget().getChildAt(0).getLayoutParams().width = 100;
-        mTabHost.addTab(mTabHost.newTabSpec(TAB_COMBAT)
-                .setIndicator(getString(R.string.tab_header_combat))
-                .setContent(new Intent(dndTabBarActivity, CombatActivity.class)));
-        x = (TextView) mTabHost.getTabWidget().getChildAt(1).findViewById(android.R.id.title);
-        x.setTextSize(12);
-        mTabHost.getTabWidget().getChildAt(1).getLayoutParams().width = 100;
-        mTabHost.addTab(mTabHost.newTabSpec(TAB_INVENTORY)
-                .setIndicator(getString(R.string.tab_header_inventory))
-                .setContent(new Intent(dndTabBarActivity, InventoryActivity.class)));
-        x = (TextView) mTabHost.getTabWidget().getChildAt(2).findViewById(android.R.id.title);
-        x.setTextSize(11);
-        mTabHost.getTabWidget().getChildAt(2).getLayoutParams().width = 100;
-        mTabHost.addTab(mTabHost.newTabSpec(TAB_NOTES)
-                .setIndicator(getString(R.string.tab_header_notes))
-                .setContent(new Intent(dndTabBarActivity, NotesActivity.class)));
-        x = (TextView) mTabHost.getTabWidget().getChildAt(3).findViewById(android.R.id.title);
-        x.setTextSize(8);
-        mTabHost.getTabWidget().getChildAt(3).getLayoutParams().width = 30;
+        // Setup Menu HUD
+        setupMenuHUD();
 
-        mTabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
-            @Override
-            public void onTabChanged(String tabId) {
-                logger.debug("Changing to " + tabId + " tab");
-            }
-        });
+        // Setup Hamburger Menu
+        setupHamburgerList();
+        setupHamburgerMenu();
+        // Create onClick responses
+        setupHamburgerOnClick();
+
     }
 
     @Override
     public void onResume(){
         super.onResume();
         logger.debug("onResume");
-        CharacterManager characterManager = CharacterManager.getInstance();
-        characterManager.syncWithDatabase(this);
+        //CharacterManager characterManager = CharacterManager.getInstance();
+        //characterManager.syncWithDatabase(this);
     }
 
     @Override
     public void onPause(){
         super.onPause();
-        CharacterManager characterManager = CharacterManager.getInstance();
-        characterManager.saveData(this);
+        //CharacterManager characterManager = CharacterManager.getInstance();
+        //characterManager.saveData(this);
     }
 
     @Override
@@ -125,8 +103,67 @@ public class DnDTabBarActivity extends TabActivity {
         super.onDestroy();
     }
 
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+            case R.id.but_hamburger_menu:
+                mHamburgerLayout.openDrawer(GravityCompat.START);
+                break;
+        }
+    }
+
     public static DnDTabBarActivity getInstance(){
         return dndTabBarActivity;
+    }
+
+    private void setupMenuHUD(){
+        mRelativeLayoutMenuHUD = (RelativeLayout) findViewById(R.id.include_menu_hud);
+        mTextViewTitle = (TextView) mRelativeLayoutMenuHUD.findViewById(R.id.text_screen_title);
+        mButtonHamburgerMenu = (ImageButton) mRelativeLayoutMenuHUD.findViewById(R.id.but_hamburger_menu);
+        mButtonHamburgerMenu.setOnClickListener(this);
+    }
+
+    /* Private Helper Methods */
+    private void setupHamburgerList(){
+        mHamburgerList = (ListView)findViewById(R.id.navList);
+        String[] osArray = {getString(R.string.text_character_info_screen) ,
+                getString(R.string.text_combat_screen),
+                getString(R.string.text_inventory_screen)};
+        mHamburgerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
+        mHamburgerList.setAdapter(mHamburgerAdapter);
+    }
+
+    private void setupHamburgerMenu(){
+        mHamburgerLayout = (DrawerLayout) findViewById(R.id.layout_main);
+        mHamburgerToggle = new ActionBarDrawerToggle(this, mHamburgerLayout, R.string.but_open_hamburger, R.string.but_close_hamburger) {
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                mTextViewTitle.setText(getString(R.string.text_testing));
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                mTextViewTitle.setText(getString(R.string.text_character_title));
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+        };
+
+        mHamburgerToggle.setDrawerIndicatorEnabled(true);
+        mHamburgerLayout.setDrawerListener(mHamburgerToggle);
+    }
+
+    private void setupHamburgerOnClick(){
+        mHamburgerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(dndTabBarActivity,("You've clicked: " + position), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

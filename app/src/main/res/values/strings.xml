@@ -13,4 +13,40 @@
     <string name="title_activity_combat">CombatActivity</string>
     <string name="title_activity_notes">NotesActivity</string>
 
+    <!-- **************** XML Helpers **************** -->
+
+    <!-- Menu HUD -->
+    <string name="but_hamburger_menu">Menu</string>
+    <string name="but_search">Search</string>
+    <string name="text_screen_title">Screen Title</string>
+    <string name="but_open_hamburger">Open Menu</string>
+    <string name="but_close_hamburger">Close Menu</string>
+    <string name="text_testing">Testing!</string>
+
+    <!-- Hamburger Menu -->
+    <string name="hint_character_name">Name</string>
+    <string name="hint_character_race">Race</string>
+    <string name="hint_character_class">Class</string>
+    <string name="hint_character_gender">Gender</string>
+    <string name="hint_character_alignment">Alignment</string>
+    <string name="hint_character_background">Background</string>
+    <string name="text_character_info_screen">Character Info</string>
+    <string name="text_combat_screen">Combat</string>
+    <string name="text_inventory_screen">Inventory</string>
+
+    <!-- Screen Titles -->
+    <string name="text_character_title">Character Info</string>
+    <!-- Stats -->
+    <string name="ability_dummy_name">Stat</string>
+    <string name="stat_default_val">--</string>
+
+    <!-- Buttons -->
+    <string name="but_delete_char">Delete Character</string>
+    <string name="but_modify_char">Modify Character</string>
+    <string name="but_modify_exp">Add Experience</string>
+
+    <!-- Footer HUD -->
+    <string name="text_level">Level:</string>
+    <string name="text_level_progress">0 / 100</string>
+
 </resources>

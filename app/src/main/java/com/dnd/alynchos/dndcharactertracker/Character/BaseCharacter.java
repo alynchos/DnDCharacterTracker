@@ -34,7 +34,6 @@ public class BaseCharacter {
     public int saveProf[] = {0, 0, 0, 0, 0, 0}; /* How proficient the character is in each saving throw (size 6)*/
     public int skillProf[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; /* How proficient the character is in each skill (size 18) */
 
-    private final int STRENGTH = 0, DEXTERITY = 1, CONSTITUTION = 2, INTELLIGENCE = 3, WISDOM = 4, CHARISMA = 5;
     private final int CARRY_COEF = 15;
 
     public enum Stat {
@@ -173,22 +172,22 @@ public class BaseCharacter {
         int index = 0;
         switch (ability) {
             case Strength:
-                index = STRENGTH;
+                index = 0;
                 break;
             case Dexterity:
-                index = DEXTERITY;
+                index = 1;
                 break;
             case Constitution:
-                index = CONSTITUTION;
+                index = 2;
                 break;
             case Intelligence:
-                index = INTELLIGENCE;
+                index = 3;
                 break;
             case Wisdom:
-                index = WISDOM;
+                index = 4;
                 break;
             case Charisma:
-                index = CHARISMA;
+                index = 5;
                 break;
         }
         return index;

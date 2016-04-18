@@ -25,10 +25,11 @@ public class SplashScreen extends Activity {
     protected void onResume()
     {
         super.onResume();
+        Logger.setLogLevel(Logger.DEBUG);
 
         logger.debug("OnResume");
 
-        // Create an Intent that will start the main activity.  Pass extras through to TabBar
+        // Create an Intent that will start the main activity.
         Intent mainIntent = new Intent(SplashScreen.this, DnDTabBarActivity.class);
         mainIntent.putExtras(getIntent());
         this.startActivity(mainIntent);
