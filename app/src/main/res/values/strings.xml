@@ -33,6 +33,7 @@
     <string name="text_character_info_screen">Character Info</string>
     <string name="text_combat_screen">Combat</string>
     <string name="text_inventory_screen">Inventory</string>
+    <string name="but_modify_character_identity">Modify Character Identity</string>
 
     <!-- Screen Titles -->
     <string name="text_character_title">Character Info</string>

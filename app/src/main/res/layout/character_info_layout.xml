@@ -1,15 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:weightSum="10.0">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <include layout="@layout/level_display"
-        android:id="@+id/include_level_display"
-        android:layout_centerHorizontal="true"
-        android:layout_width="@dimen/level_display_size"
-        android:layout_height="@dimen/level_display_size"
-        android:layout_margin="@dimen/default_padding"/>
+    <RelativeLayout
+        android:id="@+id/layout_level_display"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/level_display_size_buffer">
+
+        <include layout="@layout/level_display"
+            android:id="@+id/include_level_display"
+            android:layout_width="@dimen/level_display_size"
+            android:layout_height="@dimen/level_display_size"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/default_padding"
+            android:layout_marginBottom="@dimen/default_padding"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/but_modify_character_identity"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@android:drawable/ic_menu_add"
+            app:elevation="4dp"
+            android:scaleType="center"
+            android:layout_toEndOf="@id/include_level_display"
+            android:clickable="false"
+            android:visibility="gone"
+            app:backgroundTint="@null"
+            android:layout_alignBottom="@id/include_level_display"
+            android:layout_marginBottom="@dimen/default_padding"
+            android:layout_marginStart="@dimen/default_padding"
+            android:layout_marginEnd="@dimen/large_padding"
+            android:contentDescription="@string/but_modify_character_identity"/>
+
+
+    </RelativeLayout>
+
 
     <TextView
         android:id="@+id/text_character_name"
@@ -17,7 +45,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/hint_character_name"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/include_level_display"
+        android:layout_below="@id/layout_level_display"
         android:textSize="@dimen/very_large_font"
         android:paddingStart="@dimen/default_padding"
         android:paddingEnd="@dimen/default_padding"/>

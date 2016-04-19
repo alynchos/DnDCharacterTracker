@@ -1,13 +1,10 @@
 package com.dnd.alynchos.dndcharactertracker;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.view.Gravity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,7 +20,7 @@ import com.dnd.alynchos.dndcharactertracker.SaveData.FeedReaderDbHelper;
 /**
  * Created by Alex Lynchosky on 12/22/2014.
  */
-public class DnDTabBarActivity extends Activity implements View.OnClickListener {
+public class DnDTabBarActivity extends AppCompatActivity implements View.OnClickListener {
 
     /* Debugging */
     private static final String TAG    = DnDTabBarActivity.class.getSimpleName();
@@ -31,8 +28,6 @@ public class DnDTabBarActivity extends Activity implements View.OnClickListener 
 
     /* Main Activity */
     private static DnDTabBarActivity dndTabBarActivity;
-
-    private Resources mResources;
 
     /* Hamburger Menu */
     private ListView mHamburgerList;
@@ -54,19 +49,6 @@ public class DnDTabBarActivity extends Activity implements View.OnClickListener 
         super.onCreate(savedInstanceState);
         logger.debug("onCreate called");
         setContentView(R.layout.main);
-
-        // Prevent launching the main activity on top of other activities
-        // This will ensure we only have one instance displayed
-        final Intent intent = getIntent();
-        if (!isTaskRoot()) {
-            final String intentAction = intent.getAction();
-
-            if (intent.hasCategory(Intent.CATEGORY_LAUNCHER) && intentAction != null && intentAction.equals(Intent.ACTION_MAIN)) {
-                logger.debug("Main Activity is not the root.  Finishing Main Activity instead of launching.");
-                finish();
-                return;
-            }
-        }
 
         dndTabBarActivity = this;
         FeedReaderDbHelper.setContext(getApplicationContext());
