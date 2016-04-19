@@ -4,12 +4,24 @@
     android:orientation="vertical">
 
     <ProgressBar
-        android:id="@+id/progress_bar_level"
+        android:id="@+id/progress_bar_ring_background"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:max="100"
         android:progress="100"
+        android:progressDrawable="@drawable/level_progress_ring"
+        android:background="@null"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar_level"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:max="100"
+        android:progress="32"
         android:progressDrawable="@drawable/level_progress_bar"
         android:background="@null"
         android:layout_centerHorizontal="true"

@@ -18,20 +18,25 @@
         android:hint="@string/hint_character_name"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/include_level_display"
-        android:textSize="@dimen/large_font"
-        android:paddingTop="@dimen/default_padding"
+        android:textSize="@dimen/very_large_font"
         android:paddingStart="@dimen/default_padding"
         android:paddingEnd="@dimen/default_padding"/>
+
+    <View
+        android:id="@+id/view_center_divide"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/text_character_name"
+        android:layout_width="1dp"
+        android:layout_height="1dp"/>
 
     <TextView
         android:id="@+id/text_character_race"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/hint_character_race"
-        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@id/view_center_divide"
         android:layout_below="@id/text_character_name"
-        android:textSize="@dimen/medium_font"
-        android:paddingTop="@dimen/default_padding"
+        android:textSize="@dimen/small_font"
         android:paddingStart="@dimen/default_padding"
         android:paddingEnd="@dimen/default_padding"/>
 
@@ -40,12 +45,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/hint_character_class"
-        android:layout_alignParentEnd="true"
+        android:layout_centerHorizontal="true"
+        android:layout_toEndOf="@id/view_center_divide"
         android:layout_below="@id/text_character_name"
-        android:textSize="@dimen/medium_font"
-        android:paddingTop="@dimen/default_padding"
+        android:textSize="@dimen/small_font"
         android:paddingStart="@dimen/default_padding"
-        android:paddingEnd="@dimen/default_padding"/>
+        android:paddingEnd="@dimen/very_large_padding"/>
 
 
     <TextView
@@ -57,7 +62,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@id/text_character_race"
         android:paddingTop="@dimen/default_padding"
-        android:paddingStart="@dimen/default_padding"
+        android:paddingStart="@dimen/large_padding"
         android:paddingEnd="@dimen/default_padding"/>
 
     <TextView
@@ -69,7 +74,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@id/text_character_alignment"
         android:paddingTop="@dimen/default_padding"
-        android:paddingStart="@dimen/default_padding"
+        android:paddingStart="@dimen/large_padding"
         android:paddingEnd="@dimen/default_padding"/>
 
 
