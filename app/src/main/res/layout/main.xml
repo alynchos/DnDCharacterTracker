@@ -20,10 +20,12 @@
             android:layout_weight="0.8"/>
 
        <fragment
+           android:name="com.dnd.alynchos.dndcharactertracker.Character.CharacterSheetFragment"
            android:id="@+id/fragment_body"
            android:layout_width="match_parent"
            android:layout_height="0dp"
-           android:layout_weight="9.2"/>
+           android:layout_weight="9.2"
+           tools:layout="@layout/fragment_character_sheet_layout" />
 
     </LinearLayout>
 
@@ -35,7 +37,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_gravity="start"
-        android:background="#ffeeeeee">
+        android:background="@color/off_white">
 
         <include layout="@layout/character_info_layout"
             android:id="@+id/include_character_info"
@@ -45,7 +47,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="10dp"
-            android:background="@color/accent_material_dark"/>
+            android:background="@color/colorAccent"/>
 
         <ListView
             android:id="@+id/navList"

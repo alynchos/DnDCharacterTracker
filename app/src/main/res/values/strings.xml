@@ -50,4 +50,16 @@
     <string name="text_level">Level:</string>
     <string name="text_level_progress">0 / 100</string>
 
+    <!-- Currencies -->
+    <string name="text_platinum">Platinum</string>
+    <string name="text_gold">Gold</string>
+    <string name="text_silver">Silver</string>
+    <string name="text_copper">Copper</string>
+    <string name="text_subtract">subtract</string>
+    <string name="text_add_currency_title">Modify Currency</string>
+    <string name="hint_currency">0</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

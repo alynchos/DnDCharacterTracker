@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:weightSum="10.0">
+
+    <!-- Platinum -->
+    <LinearLayout
+        android:id="@+id/currency_plat_view"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2.5"
+        android:weightSum="10.0">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/plat_coin"
+            android:contentDescription="@string/text_platinum"
+            android:layout_weight="3.5"/>
+        <TextView
+            android:id="@+id/currency_plat_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="2dp"
+            android:gravity="center_vertical"
+            android:textSize="@dimen/small_font"
+            android:layout_weight="6.5"/>
+    </LinearLayout>
+
+    <!-- Gold -->
+    <LinearLayout
+        android:id="@+id/currency_gold_view"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2.5"
+        android:weightSum="10.0">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/gold_coin"
+            android:contentDescription="@string/text_gold"
+            android:layout_weight="3.5"/>
+        <TextView
+            android:id="@+id/currency_gold_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="2dp"
+            android:gravity="center_vertical"
+            android:textSize="@dimen/small_font"
+            android:layout_weight="6.5"/>
+    </LinearLayout>
+
+    <!-- Silver -->
+    <LinearLayout
+        android:id="@+id/currency_silver_view"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2.5"
+        android:weightSum="10.0">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/silver_coin"
+            android:contentDescription="@string/text_silver"
+            android:layout_weight="3.5"/>
+        <TextView
+            android:id="@+id/currency_silver_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="2dp"
+            android:gravity="center_vertical"
+            android:textSize="@dimen/small_font"
+            android:layout_weight="6.5"/>
+    </LinearLayout>
+
+    <!-- Copper -->
+    <LinearLayout
+        android:id="@+id/currency_copper_view"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2.5"
+        android:weightSum="10.0">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/copper_coin"
+            android:contentDescription="@string/text_copper"
+            android:layout_weight="3.5" />
+        <TextView
+            android:id="@+id/currency_copper_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="2dp"
+            android:gravity="center_vertical"
+            android:textSize="@dimen/small_font"
+            android:layout_weight="6.5" />
+    </LinearLayout>
+
+
+</LinearLayout>

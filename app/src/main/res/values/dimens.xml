@@ -12,7 +12,8 @@
     <dimen name="large_font">22sp</dimen>
     <dimen name="medium_font">18sp</dimen>
     <dimen name="small_font">14sp</dimen>
-    <dimen name="very_small_font">8sp</dimen>
+    <dimen name="very_small_font">10sp</dimen>
+    <dimen name="tiny_font">8sp</dimen>
     <!-- Specifics -->
     <dimen name="level_display_size">64dp</dimen>
     <dimen name="level_display_size_buffer">74dp</dimen>
