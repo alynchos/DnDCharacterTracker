@@ -45,16 +45,12 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
     private CheckBox mEditSkillProfs[] = new CheckBox[18];
     private CheckBox mEditSavingThrows[] = new CheckBox[6];
     private EditText mEditProf;
+    private boolean RefreshUI = true;
 
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String REFRESH_UI = "refreshUI";
 
     private OnFragmentInteractionListener mListener;
 
@@ -66,16 +62,14 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param refreshUI Whether the instance should refresh the ui.
      * @return A new instance of fragment CharacterSheetFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static CharacterSheetFragment newInstance(String param1, String param2) {
+    public static CharacterSheetFragment newInstance(boolean refreshUI) {
         CharacterSheetFragment fragment = new CharacterSheetFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putBoolean(REFRESH_UI, refreshUI);
         fragment.setArguments(args);
         return fragment;
     }
@@ -84,8 +78,7 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            RefreshUI = getArguments().getBoolean(REFRESH_UI);
         }
         // TODO: CHECK IF THIS WORKS
         CharacterManager characterManager = CharacterManager.getInstance();
@@ -309,6 +302,8 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
     }
 
     public void updateUI() {
+        // TODO: MAKE THIS REFRESH THINGY WORK
+        //if(!RefreshUI) return;
         CharacterManager characterManager = CharacterManager.getInstance();
         // Stats
         int temp[] = characterManager.getAbilities();
@@ -373,6 +368,7 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
                 mTextViewSaveMod[i].setText("" + temp[i] + " ");
             }
         }
+        RefreshUI = false;
     }
 
     /* End Private Helpers */
@@ -451,6 +447,7 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
             characterManager.setSkillsProfs(skillProfs);
             characterManager.setProficiency(prof);
             characterManager.setSavingThrows(saveProfs);
+            RefreshUI = true;
             updateUI();
         }
     };

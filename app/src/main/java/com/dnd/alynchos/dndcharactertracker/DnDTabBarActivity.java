@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.dnd.alynchos.dndcharactertracker.Character.CharacterManager;
 import com.dnd.alynchos.dndcharactertracker.Character.CharacterSheetFragment;
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
+import com.dnd.alynchos.dndcharactertracker.Items.InventoryFragment;
 import com.dnd.alynchos.dndcharactertracker.SaveData.FeedReaderDbHelper;
 
 /**
@@ -94,6 +95,19 @@ public class DnDTabBarActivity extends AppCompatActivity
                 ((CharacterSheetFragment) getSupportFragmentManager().findFragmentByTag(mCharacterSheetFragmentTag)).updateUI();
                 Toast.makeText(dndTabBarActivity, "Data Loaded", Toast.LENGTH_SHORT).show();
             }
+            else if (intent.getAction().equals(CharacterManager.UPDATE_INV_UI)) {
+                logger.debug("Update Inventory UI from broadcast");
+                InventoryFragment inventoryFragment = ((InventoryFragment) getSupportFragmentManager().findFragmentByTag(mInventoryFragmentTag));
+                inventoryFragment.updateInventoryList();
+                inventoryFragment.updateHeader();
+                //Toast.makeText(dndTabBarActivity, "Inventory Updated", Toast.LENGTH_SHORT).show();
+            } else if (intent.getAction().equals(CharacterManager.CLEAR_INV)) {
+                logger.debug("Clear Inventory broadcast");
+                InventoryFragment inventoryFragment = ((InventoryFragment) getSupportFragmentManager().findFragmentByTag(mInventoryFragmentTag));
+                inventoryFragment.updateInventoryList();
+                inventoryFragment.updateHeader();
+                //Toast.makeText(dndTabBarActivity, "Inventory Deleted", Toast.LENGTH_SHORT).show();
+            }
         }
     };
 
@@ -122,6 +136,8 @@ public class DnDTabBarActivity extends AppCompatActivity
         // Register the update intent listener
         if (!updateUIRegistered) {
             registerReceiver(updateUIReceiver, new IntentFilter(CharacterManager.UPDATE_UI));
+            registerReceiver(updateUIReceiver, new IntentFilter(CharacterManager.UPDATE_INV_UI));
+            registerReceiver(updateUIReceiver, new IntentFilter(CharacterManager.CLEAR_INV));
             updateUIRegistered = true;
         }
         CharacterManager characterManager = CharacterManager.getInstance();
@@ -332,6 +348,10 @@ public class DnDTabBarActivity extends AppCompatActivity
             case inventory:
                 mCurrentTab = Tab.inventory;
                 mTextViewTitle.setText(getString(R.string.text_inventory_title));
+                InventoryFragment inventoryFragment = new InventoryFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_body, inventoryFragment, mInventoryFragmentTag)
+                        .commit();
                 break;
             case notes:
                 mCurrentTab = Tab.notes;
