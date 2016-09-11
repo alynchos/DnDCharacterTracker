@@ -23,15 +23,6 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".Character.CharacterSheetActivity"
-            android:label="@string/title_activity_character_sheet"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="com.dnd.alynchos.UPDATE_UI" />
-                <action android:name="com.dnd.alynchos.CLEAR_CHAR" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".Items.InventoryActivity"
             android:label="@string/title_activity_inventory"
             android:screenOrientation="portrait">

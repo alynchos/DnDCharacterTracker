@@ -1,7 +1,11 @@
 package com.dnd.alynchos.dndcharactertracker;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -20,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dnd.alynchos.dndcharactertracker.Character.CharacterManager;
 import com.dnd.alynchos.dndcharactertracker.Character.CharacterSheetFragment;
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
 import com.dnd.alynchos.dndcharactertracker.SaveData.FeedReaderDbHelper;
@@ -31,11 +36,17 @@ public class DnDTabBarActivity extends AppCompatActivity
         implements View.OnClickListener, CharacterSheetFragment.OnFragmentInteractionListener {
 
     /* Debugging */
-    private static final String TAG    = DnDTabBarActivity.class.getSimpleName();
+    private static final String TAG = DnDTabBarActivity.class.getSimpleName();
     private static final Logger logger = new Logger(TAG);
 
     /* Main Activity */
     private static DnDTabBarActivity dndTabBarActivity;
+
+    /* Fragments */
+    private final String mCharacterSheetFragmentTag = "FRAG_CHAR_SHEET";
+    private final String mCombatFragmentTag = "FRAG_COMBAT";
+    private final String mInventoryFragmentTag = "FRAG_INVENTORY";
+    private final String mNotesFragmentTag = "FRAG_NOTES";
 
     /* Hamburger Menu */
     private ListView mHamburgerList;
@@ -49,20 +60,42 @@ public class DnDTabBarActivity extends AppCompatActivity
     private RelativeLayout mRelativeLayoutMenuHUD;
     private ImageButton mButtonHamburgerMenu;
     private TextView mTextViewTitle;
+    private Tab mCurrentTab = Tab.character;
+
+    private enum Tab {
+        character,
+        combat,
+        inventory,
+        notes
+    }
 
     /* Currency */
     private LinearLayout mLinearLayoutPlat;
     private LinearLayout mLinearLayoutGold;
     private LinearLayout mLinearLayoutSilver;
-    private LinearLayout mLinearLayoutCopper;
     private TextView mTextViewPlatVal;
     private TextView mTextViewGoldVal;
     private TextView mTextViewSilverVal;
     private TextView mTextViewCopperVal;
 
-    /* Save Data */
-    private static FeedReaderDbHelper feedReaderDbHelper;
-    private static boolean dataSaved = false;
+
+    /* Broadcast Receivers */
+
+    boolean updateUIRegistered = false;
+
+    /**
+     * Broadcast receiver listening to Personal Status updates from VPTabBarActivity
+     */
+    private BroadcastReceiver updateUIReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context ctx, Intent intent) {
+            if (intent.getAction().equals(CharacterManager.UPDATE_UI)) {
+                logger.debug("Update UI from broadcast");
+                ((CharacterSheetFragment) getSupportFragmentManager().findFragmentByTag(mCharacterSheetFragmentTag)).updateUI();
+                Toast.makeText(dndTabBarActivity, "Data Loaded", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,43 +104,49 @@ public class DnDTabBarActivity extends AppCompatActivity
         setContentView(R.layout.main);
 
         dndTabBarActivity = this;
-        FeedReaderDbHelper.setContext(getApplicationContext());
-        feedReaderDbHelper = FeedReaderDbHelper.getInstance();
 
-        // Setup Menu HUD
+        FeedReaderDbHelper.setContext(this);
+
+        // Init all components
         setupMenuHUD();
-
-        // Setup Hamburger Menu
         setupHamburgerList();
         setupHamburgerMenu();
-        // Create onClick responses
         setupHamburgerOnClick();
-
+        switchTab(Tab.character);
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         logger.debug("onResume");
-        //CharacterManager characterManager = CharacterManager.getInstance();
-        //characterManager.syncWithDatabase(this);
+        // Register the update intent listener
+        if (!updateUIRegistered) {
+            registerReceiver(updateUIReceiver, new IntentFilter(CharacterManager.UPDATE_UI));
+            updateUIRegistered = true;
+        }
+        CharacterManager characterManager = CharacterManager.getInstance();
+        characterManager.syncWithDatabase(this);
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
-        //CharacterManager characterManager = CharacterManager.getInstance();
-        //characterManager.saveData(this);
+        if (updateUIRegistered) {
+            unregisterReceiver(updateUIReceiver);
+            updateUIRegistered = false;
+        }
+        CharacterManager characterManager = CharacterManager.getInstance();
+        characterManager.saveData(this);
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
     }
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.but_hamburger_menu:
                 mHamburgerLayout.openDrawer(GravityCompat.START);
                 break;
@@ -117,14 +156,15 @@ public class DnDTabBarActivity extends AppCompatActivity
         }
     }
 
-    public static DnDTabBarActivity getInstance(){
+    public static DnDTabBarActivity getInstance() {
         return dndTabBarActivity;
     }
+
     /* Fragment Listeners */
 
     @Override
-    public void onContentFragmentInteraction(String string){
-        Toast.makeText(dndTabBarActivity,("Fragment communication successful!"), Toast.LENGTH_SHORT).show();
+    public void onCharacterSheetFragmentInteraction(String string) {
+        Toast.makeText(dndTabBarActivity, ("Fragment communication successful!"), Toast.LENGTH_SHORT).show();
     }
 
     /* End Fragment Listeners */
@@ -149,17 +189,17 @@ public class DnDTabBarActivity extends AppCompatActivity
         final TextView new_text_copper = (TextView) addCurrencyView.findViewById(R.id.include_currency_single_copper).findViewById(R.id.currency_single_text);
         new_text_copper.setText(text_copper.getText());
         // Images
-        ((ImageView)addCurrencyView.findViewById(R.id.include_currency_single_plat).findViewById(R.id.currency_single_image)).setImageResource(R.drawable.plat_coin);
-        ((ImageView)addCurrencyView.findViewById(R.id.include_currency_single_gold).findViewById(R.id.currency_single_image)).setImageResource(R.drawable.gold_coin);
-        ((ImageView)addCurrencyView.findViewById(R.id.include_currency_single_silver).findViewById(R.id.currency_single_image)).setImageResource(R.drawable.silver_coin);
-        ((ImageView)addCurrencyView.findViewById(R.id.include_currency_single_copper).findViewById(R.id.currency_single_image)).setImageResource(R.drawable.copper_coin);
+        ((ImageView) addCurrencyView.findViewById(R.id.include_currency_single_plat).findViewById(R.id.currency_single_image)).setImageResource(R.drawable.plat_coin);
+        ((ImageView) addCurrencyView.findViewById(R.id.include_currency_single_gold).findViewById(R.id.currency_single_image)).setImageResource(R.drawable.gold_coin);
+        ((ImageView) addCurrencyView.findViewById(R.id.include_currency_single_silver).findViewById(R.id.currency_single_image)).setImageResource(R.drawable.silver_coin);
+        ((ImageView) addCurrencyView.findViewById(R.id.include_currency_single_copper).findViewById(R.id.currency_single_image)).setImageResource(R.drawable.copper_coin);
         AlertDialog modifyCurrency = new AlertDialog.Builder(this)
                 .setTitle(R.string.text_add_currency_title)
                 .setView(addCurrencyView)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        updateCurrency(new_text_plat.getText(),new_text_gold.getText(),new_text_silver.getText(),new_text_copper.getText());
+                        updateCurrency(new_text_plat.getText(), new_text_gold.getText(), new_text_silver.getText(), new_text_copper.getText());
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
@@ -171,16 +211,19 @@ public class DnDTabBarActivity extends AppCompatActivity
                                 CharSequence gold_val,
                                 CharSequence silver_val,
                                 CharSequence copper_val) {
-        if(plat_val == null || plat_val.length() == 0) mLinearLayoutPlat.setVisibility(View.INVISIBLE);
+        if (plat_val == null || plat_val.length() == 0)
+            mLinearLayoutPlat.setVisibility(View.INVISIBLE);
         else mLinearLayoutPlat.setVisibility(View.VISIBLE);
 
-        if(gold_val == null || gold_val.length() == 0) mLinearLayoutGold.setVisibility(View.INVISIBLE);
+        if (gold_val == null || gold_val.length() == 0)
+            mLinearLayoutGold.setVisibility(View.INVISIBLE);
         else mLinearLayoutGold.setVisibility(View.VISIBLE);
 
-        if(silver_val == null || silver_val.length() == 0) mLinearLayoutSilver.setVisibility(View.INVISIBLE);
+        if (silver_val == null || silver_val.length() == 0)
+            mLinearLayoutSilver.setVisibility(View.INVISIBLE);
         else mLinearLayoutSilver.setVisibility(View.VISIBLE);
 
-        if(copper_val == null || copper_val.length() == 0){
+        if (copper_val == null || copper_val.length() == 0) {
             copper_val = "0";
         }
         mTextViewPlatVal.setText(plat_val);
@@ -195,6 +238,7 @@ public class DnDTabBarActivity extends AppCompatActivity
 
     private void setupMenuHUD() {
         mRelativeLayoutMenuHUD = (RelativeLayout) findViewById(R.id.include_menu_hud);
+        assert mRelativeLayoutMenuHUD != null;
         mTextViewTitle = (TextView) mRelativeLayoutMenuHUD.findViewById(R.id.text_screen_title);
         mButtonHamburgerMenu = (ImageButton) mRelativeLayoutMenuHUD.findViewById(R.id.but_hamburger_menu);
         mButtonHamburgerMenu.setOnClickListener(this);
@@ -207,7 +251,6 @@ public class DnDTabBarActivity extends AppCompatActivity
         mLinearLayoutPlat = (LinearLayout) mCurrencyLayout.findViewById(R.id.currency_plat_view);
         mLinearLayoutGold = (LinearLayout) mCurrencyLayout.findViewById(R.id.currency_gold_view);
         mLinearLayoutSilver = (LinearLayout) mCurrencyLayout.findViewById(R.id.currency_silver_view);
-        mLinearLayoutCopper = (LinearLayout) mCurrencyLayout.findViewById(R.id.currency_copper_view);
         mTextViewPlatVal = (TextView) mCurrencyLayout.findViewById(R.id.currency_plat_text);
         mTextViewGoldVal = (TextView) mCurrencyLayout.findViewById(R.id.currency_gold_text);
         mTextViewSilverVal = (TextView) mCurrencyLayout.findViewById(R.id.currency_silver_text);
@@ -230,14 +273,12 @@ public class DnDTabBarActivity extends AppCompatActivity
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                mTextViewTitle.setText(getString(R.string.text_testing));
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                mTextViewTitle.setText(getString(R.string.text_character_title));
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
@@ -252,9 +293,54 @@ public class DnDTabBarActivity extends AppCompatActivity
         mHamburgerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(dndTabBarActivity, ("You've clicked: " + position), Toast.LENGTH_SHORT).show();
+                switch (position) {
+                    case 0:
+                        if (mCurrentTab != Tab.character) switchTab(Tab.character);
+                        break;
+                    case 1:
+                        if (mCurrentTab != Tab.combat) switchTab(Tab.combat);
+                        break;
+                    case 2:
+                        if (mCurrentTab != Tab.inventory) switchTab(Tab.inventory);
+                        break;
+                    case 3:
+                        if (mCurrentTab != Tab.notes) switchTab(Tab.notes);
+                        break;
+                    default:
+                        logger.error("Unacceptable tab selected");
+                        break;
+                }
+                mHamburgerLayout.closeDrawers();
             }
         });
+    }
+
+    private void switchTab(Tab tab) {
+        switch (tab) {
+            case character:
+                mCurrentTab = Tab.character;
+                mTextViewTitle.setText(getString(R.string.text_character_title));
+                CharacterSheetFragment characterSheetFragment = new CharacterSheetFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_body, characterSheetFragment, mCharacterSheetFragmentTag)
+                        .commit();
+                break;
+            case combat:
+                mCurrentTab = Tab.combat;
+                mTextViewTitle.setText(getString(R.string.text_combat_title));
+                break;
+            case inventory:
+                mCurrentTab = Tab.inventory;
+                mTextViewTitle.setText(getString(R.string.text_inventory_title));
+                break;
+            case notes:
+                mCurrentTab = Tab.notes;
+                mTextViewTitle.setText(getString(R.string.text_notes_title));
+                break;
+            default:
+                logger.error("Unacceptable tab selected");
+                break;
+        }
     }
 
     /* End Setup Helper Methods */

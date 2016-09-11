@@ -19,13 +19,12 @@
             android:layout_height="0dp"
             android:layout_weight="0.8"/>
 
-       <fragment
-           android:name="com.dnd.alynchos.dndcharactertracker.Character.CharacterSheetFragment"
+       <LinearLayout
            android:id="@+id/fragment_body"
            android:layout_width="match_parent"
            android:layout_height="0dp"
            android:layout_weight="9.2"
-           tools:layout="@layout/fragment_character_sheet_layout" />
+           android:orientation="horizontal" />
 
     </LinearLayout>
 

@@ -4,53 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <EditText
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:hint="name"
-        android:id="@+id/edit_name"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="10dp"
-        android:inputType="textImeMultiLine"
-        android:imeOptions="actionNext"/>
-    <EditText
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:hint="race"
-        android:id="@+id/edit_race"
-        android:layout_below="@id/edit_name"
-        android:textSize="10dp"
-        android:inputType="textImeMultiLine"
-        android:imeOptions="actionNext"/>
-    <EditText
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:hint="alignment"
-        android:id="@+id/edit_alignment"
-        android:layout_below="@id/edit_name"
-        android:layout_toRightOf="@id/edit_race"
-        android:textSize="10dp"
-        android:inputType="textImeMultiLine"
-        android:imeOptions="actionNext"/>
-    <EditText
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:hint="class"
-        android:id="@+id/edit_class"
-        android:layout_below="@id/edit_name"
-        android:layout_toRightOf="@id/edit_alignment"
-        android:textSize="10dp"
-        android:inputType="textImeMultiLine"
-        android:imeOptions="actionDone"/>
     <!-- Stats -->
     <EditText
         android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:hint="strength"
         android:id="@+id/edit_strength"
-        android:layout_below="@id/edit_race"
         android:inputType="number"/>
     <EditText
         android:layout_width="110dp"
@@ -95,7 +54,6 @@
         android:hint="proficiency"
         android:id="@+id/edit_proficiency"
         android:layout_toRightOf="@id/edit_strength"
-        android:layout_below="@id/edit_race"
         android:inputType="number"
         android:imeOptions="actionDone"/>
 

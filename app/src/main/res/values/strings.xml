@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">D&amp;D Tracker!</string>
+    <string name="app_name">D&amp;D 5e Character Tracker</string>
     <string name="tab_header_character">Character</string>
     <string name="tab_header_combat">Combat</string>
     <string name="tab_header_inventory">Inventory</string>
@@ -37,9 +37,32 @@
 
     <!-- Screen Titles -->
     <string name="text_character_title">Character Info</string>
+    <string name="text_combat_title">Combat</string>
+    <string name="text_inventory_title">Inventory</string>
+    <string name="text_notes_title">Notes</string>
     <!-- Stats -->
     <string name="ability_dummy_name">Stat</string>
     <string name="stat_default_val">--</string>
+    <!-- Skills -->
+    <string name="text_default_val"> +0</string>
+    <string name="text_acrobatics">Acrobatics</string>
+    <string name="text_animal_handling">Animal Handling</string>
+    <string name="text_arcana">Arcana</string>
+    <string name="text_athletics">Athletics</string>
+    <string name="text_deception">Deception</string>
+    <string name="text_history">History</string>
+    <string name="text_insight">Insight</string>
+    <string name="text_intimidation">Intimidation</string>
+    <string name="text_investigation">Investigation</string>
+    <string name="text_medicine">Medicine</string>
+    <string name="text_nature">Nature</string>
+    <string name="text_perception">Perception</string>
+    <string name="text_performance">Performance</string>
+    <string name="text_persuasion">Persuasion</string>
+    <string name="text_religion">Religion</string>
+    <string name="text_sleight_of_hand">Sleight of Hand</string>
+    <string name="text_stealth">Stealth</string>
+    <string name="text_survival">Survival</string>
 
     <!-- Buttons -->
     <string name="but_delete_char">Delete Character</string>
