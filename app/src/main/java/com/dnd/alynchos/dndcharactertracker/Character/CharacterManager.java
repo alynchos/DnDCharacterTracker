@@ -615,6 +615,7 @@ public class CharacterManager {
         columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_RACE;
         columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_CLASS;
         columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_ALIGN;
+        assert feedReaderDbHelper != null;
         retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns);
         retrieve.moveToFirst();
         mCharacter.name = retrieve.getString(0);
