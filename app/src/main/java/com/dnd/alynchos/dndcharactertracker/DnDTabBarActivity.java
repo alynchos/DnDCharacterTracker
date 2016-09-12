@@ -7,13 +7,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
@@ -34,7 +37,9 @@ import com.dnd.alynchos.dndcharactertracker.SaveData.FeedReaderDbHelper;
  * Created by Alex Lynchosky on 12/22/2014.
  */
 public class DnDTabBarActivity extends AppCompatActivity
-        implements View.OnClickListener, CharacterSheetFragment.OnFragmentInteractionListener {
+        implements View.OnClickListener,
+        GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener,
+        CharacterSheetFragment.OnFragmentInteractionListener {
 
     /* Debugging */
     private static final String TAG = DnDTabBarActivity.class.getSimpleName();
@@ -42,12 +47,16 @@ public class DnDTabBarActivity extends AppCompatActivity
 
     /* Main Activity */
     private static DnDTabBarActivity dndTabBarActivity;
+    ViewConfiguration mViewConfiguration;
 
     /* Fragments */
     private final String mCharacterSheetFragmentTag = "FRAG_CHAR_SHEET";
     private final String mCombatFragmentTag = "FRAG_COMBAT";
     private final String mInventoryFragmentTag = "FRAG_INVENTORY";
     private final String mNotesFragmentTag = "FRAG_NOTES";
+
+    /* Touch Events */
+    private GestureDetectorCompat mDetector;
 
     /* Hamburger Menu */
     private ListView mHamburgerList;
@@ -81,7 +90,6 @@ public class DnDTabBarActivity extends AppCompatActivity
 
 
     /* Broadcast Receivers */
-
     boolean updateUIRegistered = false;
 
     /**
@@ -94,8 +102,7 @@ public class DnDTabBarActivity extends AppCompatActivity
                 logger.debug("Update UI from broadcast");
                 ((CharacterSheetFragment) getSupportFragmentManager().findFragmentByTag(mCharacterSheetFragmentTag)).updateUI();
                 Toast.makeText(dndTabBarActivity, "Data Loaded", Toast.LENGTH_SHORT).show();
-            }
-            else if (intent.getAction().equals(CharacterManager.UPDATE_INV_UI)) {
+            } else if (intent.getAction().equals(CharacterManager.UPDATE_INV_UI)) {
                 logger.debug("Update Inventory UI from broadcast");
                 InventoryFragment inventoryFragment = ((InventoryFragment) getSupportFragmentManager().findFragmentByTag(mInventoryFragmentTag));
                 inventoryFragment.updateInventoryList();
@@ -127,6 +134,23 @@ public class DnDTabBarActivity extends AppCompatActivity
         setupHamburgerMenu();
         setupHamburgerOnClick();
         switchTab(Tab.character);
+        mViewConfiguration = ViewConfiguration.get(this);
+        // Instantiate the gesture detector with the
+        // application context and an implementation of
+        // GestureDetector.OnGestureListener
+        mDetector = new GestureDetectorCompat(this, this);
+        // Set the gesture detector as the double tap
+        // listener.
+        mDetector.setOnDoubleTapListener(this);
+        View fragment_body = findViewById(R.id.fragment_body);
+        assert fragment_body != null;
+        fragment_body.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mDetector.onTouchEvent(event);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -170,6 +194,72 @@ public class DnDTabBarActivity extends AppCompatActivity
                 currencyOnClick(v);
                 break;
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        this.mDetector.onTouchEvent(event);
+        // Be sure to call the superclass implementation
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean onDown(MotionEvent event) {
+        //logger.debug("onDown: " + event.toString());
+        return true;
+    }
+
+    @Override
+    public boolean onFling(MotionEvent event1, MotionEvent event2,
+                           float velocityX, float velocityY) {
+        if(velocityX <= (mViewConfiguration.getScaledMinimumFlingVelocity())* -1){
+            switchTab(getNextTab());
+        }
+        else if(velocityX >= mViewConfiguration.getScaledMinimumFlingVelocity()){
+            switchTab(getNextTab(false));
+        }
+        return true;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent event) {
+        //logger.debug("onLongPress: " + event.toString());
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+                            float distanceY) {
+        //logger.debug("onScroll: " + e1.toString() + e2.toString());
+        return true;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent event) {
+        //logger.debug("onShowPress: " + event.toString());
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent event) {
+        //logger.debug("onSingleTapUp: " + event.toString());
+        return true;
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent event) {
+        //logger.debug("onDoubleTap: " + event.toString());
+        return true;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent event) {
+        //logger.debug("onDoubleTapEvent: " + event.toString());
+        return true;
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(MotionEvent event) {
+        //logger.debug("onSingleTapConfirmed: " + event.toString());
+        return true;
     }
 
     public static DnDTabBarActivity getInstance() {
@@ -360,6 +450,26 @@ public class DnDTabBarActivity extends AppCompatActivity
             default:
                 logger.error("Unacceptable tab selected");
                 break;
+        }
+    }
+
+    private Tab getNextTab(){
+        return getNextTab(true);
+    }
+    private Tab getNextTab(boolean forward){
+        if(mCurrentTab == null) return Tab.character;
+        switch(mCurrentTab){
+            case character:
+                return forward ? Tab.combat : Tab.notes;
+            case combat:
+                return forward ? Tab.inventory : Tab.character;
+            case inventory:
+                return forward ? Tab.notes : Tab.combat;
+            case notes:
+                return forward ? Tab.character : Tab.inventory;
+            default:
+                logger.error("Unacceptable tab selected");
+                return Tab.character;
         }
     }
 
