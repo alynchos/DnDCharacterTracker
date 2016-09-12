@@ -139,6 +139,14 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
         mAddInvFlatDam = (EditText) mInventoryAddView.findViewById(R.id.add_inventory_flat_dam);
         mAddInvRange = (EditText) mInventoryAddView.findViewById(R.id.add_inventory_range);
         mAddInvDamType = (EditText) mInventoryAddView.findViewById(R.id.add_inventory_dam_type);
+        final LinearLayout isWeaponView = (LinearLayout) mInventoryAddView.findViewById(R.id.inventory_weapon_list);
+        final CheckBox isWeaponCheckBox = (CheckBox) mInventoryAddView.findViewById(R.id.inventory_is_weapon_checkbox);
+        isWeaponCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                isWeaponView.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     private void fillInventoryModView() {
@@ -155,6 +163,8 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
             mAddInvRange.setText("" + weapon.range);
             mAddInvDamType.setText("" + weapon.damage_type);
         }
+        final Button buttonDeleteItem = (Button) mInventoryAddView.findViewById(R.id.button_delete_item);
+        buttonDeleteItem.setOnClickListener(this);
     }
 
     /* End Dialog Inits */
@@ -179,16 +189,6 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
         logger.debug("Showing Add Inventory Dialog");
         LayoutInflater inflater = getActivity().getLayoutInflater();
         mInventoryAddView = inflater.inflate(R.layout.mod_inventory_item_layout, null);
-        final LinearLayout isWeaponView = (LinearLayout) mInventoryAddView.findViewById(R.id.inventory_weapon_list);
-        final Button buttonDeleteItem = (Button) mInventoryAddView.findViewById(R.id.button_delete_item);
-        buttonDeleteItem.setOnClickListener(this);
-        final CheckBox isWeaponCheckBox = (CheckBox) mInventoryAddView.findViewById(R.id.inventory_is_weapon_checkbox);
-        isWeaponCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                isWeaponView.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            }
-        });
         initInventoryAddView();
         fillInventoryModView();
         mActiveAlertDialog = new AlertDialog.Builder(getActivity())
