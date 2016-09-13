@@ -110,5 +110,7 @@
     <string name="text_none">none</string>
     <string name="text_empty">empty</string>
     <string name="text_ammo">Ammo</string>
+    <string name="hint_new_value">new value</string>
+    <string name="text_current_health_title">Current Health</string>
 
 </resources>

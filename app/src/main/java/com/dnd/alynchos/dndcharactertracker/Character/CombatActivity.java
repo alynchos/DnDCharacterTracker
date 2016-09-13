@@ -247,7 +247,6 @@ public class CombatActivity extends Activity implements View.OnClickListener {
         mInventoryList.setOnItemClickListener(inventoryOnClickListener);
     }
 
-    /* Add Experience */
     DialogInterface.OnClickListener modifyElement = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
