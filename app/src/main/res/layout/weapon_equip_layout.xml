@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/light_grey">
 
-    <!-- Weapon 1 -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_alignParentLeft="true"
         android:layout_marginTop="10dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/text_weapon1_name"
-            android:text="Weapon Name"
+            android:text="@string/text_weapon_name"
             android:maxLength="22"
             android:ellipsize="end"
             android:singleLine="true"
@@ -25,137 +23,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/text_weapon1_atk_bns"
-            android:text="+X"
-            android:textSize="12dp"
+            android:text="@string/text_weapon_base_add_default_val"
+            android:textSize="@dimen/small_font"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/text_weapon1_damage"
-            android:text="XdX + base + type"
+            android:text="@string/text_weapon_default_val"
             android:maxLength="18"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textSize="12dp"
+            android:textSize="@dimen/small_font"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"/>
     </LinearLayout>
-    <Button
-        android:layout_width="70dp"
-        android:layout_height="35dp"
-        android:id="@+id/button_modify_weapon1"
-        android:text="Modify"
-        android:textSize="10dp"
-        android:layout_marginLeft="3dp"
-        android:layout_alignParentRight="true"/>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/button_modify_weapon1"
-        android:background="@android:color/black"/>
-
-    <!-- Weapon 2 -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentLeft="true"
-        android:layout_marginTop="10dp"
-        android:layout_below="@+id/button_modify_weapon1">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/text_weapon2_name"
-            android:text="Weapon Name"
-            android:maxLength="22"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/text_weapon2_atk_bns"
-            android:text="+X"
-            android:textSize="12dp"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/text_weapon2_damage"
-            android:text="XdX + base + type"
-            android:maxLength="18"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:textSize="12dp"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"/>
-    </LinearLayout>
-    <Button
-        android:layout_width="70dp"
-        android:layout_height="35dp"
-        android:id="@+id/button_modify_weapon2"
-        android:text="Modify"
-        android:textSize="10dp"
-        android:layout_marginLeft="3dp"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/button_modify_weapon1"/>
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/button_modify_weapon2"
-        android:background="@android:color/black"/>
-
-    <!-- Weapon 3 -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentLeft="true"
-        android:layout_marginTop="10dp"
-        android:layout_below="@+id/button_modify_weapon2">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/text_weapon3_name"
-            android:text="Weapon Name"
-            android:maxLength="22"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/text_weapon3_atk_bns"
-            android:text="+X"
-            android:textSize="12dp"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/text_weapon3_damage"
-            android:text="XdX + base + type"
-            android:maxLength="18"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:textSize="12dp"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"/>
-    </LinearLayout>
-    <Button
-        android:layout_width="70dp"
-        android:layout_height="35dp"
-        android:id="@+id/button_modify_weapon3"
-        android:text="Modify"
-        android:textSize="10dp"
-        android:layout_marginLeft="3dp"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/button_modify_weapon2"/>
-
-</RelativeLayout>
+</LinearLayout>

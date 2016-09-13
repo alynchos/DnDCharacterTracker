@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -29,6 +31,8 @@ import android.widget.Toast;
 
 import com.dnd.alynchos.dndcharactertracker.Character.CharacterManager;
 import com.dnd.alynchos.dndcharactertracker.Character.CharacterSheetFragment;
+import com.dnd.alynchos.dndcharactertracker.Character.CombatFragment;
+import com.dnd.alynchos.dndcharactertracker.Character.NotesFragment;
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
 import com.dnd.alynchos.dndcharactertracker.Items.InventoryFragment;
 import com.dnd.alynchos.dndcharactertracker.SaveData.FeedReaderDbHelper;
@@ -79,6 +83,13 @@ public class DnDTabBarActivity extends AppCompatActivity
         notes
     }
 
+    private enum Direction {
+        left,
+        right,
+        up,
+        down
+    }
+
     /* Currency */
     private LinearLayout mLinearLayoutPlat;
     private LinearLayout mLinearLayoutGold;
@@ -100,20 +111,27 @@ public class DnDTabBarActivity extends AppCompatActivity
         public void onReceive(Context ctx, Intent intent) {
             if (intent.getAction().equals(CharacterManager.UPDATE_UI)) {
                 logger.debug("Update UI from broadcast");
-                ((CharacterSheetFragment) getSupportFragmentManager().findFragmentByTag(mCharacterSheetFragmentTag)).updateUI();
-                Toast.makeText(dndTabBarActivity, "Data Loaded", Toast.LENGTH_SHORT).show();
+                CharacterSheetFragment csf = ((CharacterSheetFragment) getSupportFragmentManager().findFragmentByTag(mCharacterSheetFragmentTag));
+                if(csf != null) {
+                    csf.updateUI();
+                    Toast.makeText(dndTabBarActivity, "Data Loaded", Toast.LENGTH_SHORT).show();
+                }
             } else if (intent.getAction().equals(CharacterManager.UPDATE_INV_UI)) {
                 logger.debug("Update Inventory UI from broadcast");
                 InventoryFragment inventoryFragment = ((InventoryFragment) getSupportFragmentManager().findFragmentByTag(mInventoryFragmentTag));
-                inventoryFragment.updateInventoryList();
-                inventoryFragment.updateHeader();
-                //Toast.makeText(dndTabBarActivity, "Inventory Updated", Toast.LENGTH_SHORT).show();
+                if(inventoryFragment != null) {
+                    inventoryFragment.updateInventoryList();
+                    inventoryFragment.updateHeader();
+                    //Toast.makeText(dndTabBarActivity, "Inventory Updated", Toast.LENGTH_SHORT).show();
+                }
             } else if (intent.getAction().equals(CharacterManager.CLEAR_INV)) {
                 logger.debug("Clear Inventory broadcast");
                 InventoryFragment inventoryFragment = ((InventoryFragment) getSupportFragmentManager().findFragmentByTag(mInventoryFragmentTag));
-                inventoryFragment.updateInventoryList();
-                inventoryFragment.updateHeader();
-                //Toast.makeText(dndTabBarActivity, "Inventory Deleted", Toast.LENGTH_SHORT).show();
+                if(inventoryFragment != null) {
+                    inventoryFragment.updateInventoryList();
+                    inventoryFragment.updateHeader();
+                    //Toast.makeText(dndTabBarActivity, "Inventory Deleted", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     };
@@ -133,7 +151,7 @@ public class DnDTabBarActivity extends AppCompatActivity
         setupHamburgerList();
         setupHamburgerMenu();
         setupHamburgerOnClick();
-        switchTab(Tab.character);
+        switchTab(Tab.character, Direction.down);
         mViewConfiguration = ViewConfiguration.get(this);
         // Instantiate the gesture detector with the
         // application context and an implementation of
@@ -212,11 +230,10 @@ public class DnDTabBarActivity extends AppCompatActivity
     @Override
     public boolean onFling(MotionEvent event1, MotionEvent event2,
                            float velocityX, float velocityY) {
-        if(velocityX <= (mViewConfiguration.getScaledMinimumFlingVelocity())* -1){
-            switchTab(getNextTab());
-        }
-        else if(velocityX >= mViewConfiguration.getScaledMinimumFlingVelocity()){
-            switchTab(getNextTab(false));
+        if (velocityX <= (mViewConfiguration.getScaledMinimumFlingVelocity()) * -1) {
+            switchTab(getNextTab(), Direction.left);
+        } else if (velocityX >= mViewConfiguration.getScaledMinimumFlingVelocity()) {
+            switchTab(getNextTab(false), Direction.right);
         }
         return true;
     }
@@ -367,7 +384,8 @@ public class DnDTabBarActivity extends AppCompatActivity
         mHamburgerList = (ListView) findViewById(R.id.navList);
         String[] osArray = {getString(R.string.text_character_info_screen),
                 getString(R.string.text_combat_screen),
-                getString(R.string.text_inventory_screen)};
+                getString(R.string.text_inventory_screen),
+                getString(R.string.text_notes_screen)};
         mHamburgerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
         mHamburgerList.setAdapter(mHamburgerAdapter);
     }
@@ -401,16 +419,16 @@ public class DnDTabBarActivity extends AppCompatActivity
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                     case 0:
-                        if (mCurrentTab != Tab.character) switchTab(Tab.character);
+                        if (mCurrentTab != Tab.character) switchTab(Tab.character, Direction.down);
                         break;
                     case 1:
-                        if (mCurrentTab != Tab.combat) switchTab(Tab.combat);
+                        if (mCurrentTab != Tab.combat) switchTab(Tab.combat, Direction.down);
                         break;
                     case 2:
-                        if (mCurrentTab != Tab.inventory) switchTab(Tab.inventory);
+                        if (mCurrentTab != Tab.inventory) switchTab(Tab.inventory, Direction.down);
                         break;
                     case 3:
-                        if (mCurrentTab != Tab.notes) switchTab(Tab.notes);
+                        if (mCurrentTab != Tab.notes) switchTab(Tab.notes, Direction.down);
                         break;
                     default:
                         logger.error("Unacceptable tab selected");
@@ -421,44 +439,68 @@ public class DnDTabBarActivity extends AppCompatActivity
         });
     }
 
-    private void switchTab(Tab tab) {
+    private void switchTab(Tab tab, Direction dir) {
+        Fragment fragmentToChange = null;
+        String fragmentTag = "";
         switch (tab) {
             case character:
                 mCurrentTab = Tab.character;
                 mTextViewTitle.setText(getString(R.string.text_character_title));
-                CharacterSheetFragment characterSheetFragment = new CharacterSheetFragment();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_body, characterSheetFragment, mCharacterSheetFragmentTag)
-                        .commit();
+                fragmentToChange = new CharacterSheetFragment();
+                fragmentTag = mCharacterSheetFragmentTag;
                 break;
             case combat:
                 mCurrentTab = Tab.combat;
                 mTextViewTitle.setText(getString(R.string.text_combat_title));
+                fragmentToChange = new CombatFragment();
+                fragmentTag = mCombatFragmentTag;
                 break;
             case inventory:
                 mCurrentTab = Tab.inventory;
                 mTextViewTitle.setText(getString(R.string.text_inventory_title));
-                InventoryFragment inventoryFragment = new InventoryFragment();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_body, inventoryFragment, mInventoryFragmentTag)
-                        .commit();
+                fragmentToChange = new InventoryFragment();
+                fragmentTag = mInventoryFragmentTag;
                 break;
             case notes:
                 mCurrentTab = Tab.notes;
                 mTextViewTitle.setText(getString(R.string.text_notes_title));
+                fragmentToChange = new NotesFragment();
+                fragmentTag = mNotesFragmentTag;
                 break;
             default:
                 logger.error("Unacceptable tab selected");
                 break;
         }
+        int intro_anim = 0, outro_anim = 0;
+        switch(dir){
+            case left:
+                //intro_anim = android.R.anim.slide_out_right;
+                //outro_anim = android.R.anim.fade_out;
+                break;
+            case right:
+                //intro_anim = android.R.anim.slide_in_left;
+                //outro_anim = android.R.anim.fade_out;
+                break;
+            case up:
+            case down:
+            default:
+                intro_anim = android.R.anim.fade_in;
+                outro_anim = android.R.anim.fade_out;
+                break;
+        }
+        getSupportFragmentManager().beginTransaction()
+        .setCustomAnimations(intro_anim, outro_anim)
+        .replace(R.id.fragment_body, fragmentToChange, fragmentTag)
+        .commit();
     }
 
-    private Tab getNextTab(){
+    private Tab getNextTab() {
         return getNextTab(true);
     }
-    private Tab getNextTab(boolean forward){
-        if(mCurrentTab == null) return Tab.character;
-        switch(mCurrentTab){
+
+    private Tab getNextTab(boolean forward) {
+        if (mCurrentTab == null) return Tab.character;
+        switch (mCurrentTab) {
             case character:
                 return forward ? Tab.combat : Tab.notes;
             case combat:

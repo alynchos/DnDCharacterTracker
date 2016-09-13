@@ -52,22 +52,6 @@ public class CombatActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.combat_layout);
 
         // Buttons
-        mButtonInit = (Button) findViewById(R.id.button_modify_armor);
-        mButtonInit.setOnClickListener(this);
-        mButtonInit = (Button) findViewById(R.id.button_modify_health);
-        mButtonInit.setOnClickListener(this);
-        mButtonInit = (Button) findViewById(R.id.button_modify_initiative);
-        mButtonInit.setOnClickListener(this);
-        mButtonInit = (Button) findViewById(R.id.button_modify_speed);
-        mButtonInit.setOnClickListener(this);
-        mButtonInit = (Button) findViewById(R.id.button_modify_weapon1);
-        mButtonInit.setOnClickListener(this);
-        mButtonInit = (Button) findViewById(R.id.button_modify_weapon2);
-        mButtonInit.setOnClickListener(this);
-        mButtonInit = (Button) findViewById(R.id.button_modify_weapon3);
-        mButtonInit.setOnClickListener(this);
-        mButtonInit = (Button) findViewById(R.id.button_modify_ammo);
-        mButtonInit.setOnClickListener(this);
         mButtonInit = (Button) findViewById(R.id.button_add_ammo);
         mButtonInit.setOnClickListener(this);
         mButtonInit = (Button) findViewById(R.id.button_subtract_ammo);
@@ -97,23 +81,6 @@ public class CombatActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.button_modify_armor:
-            case R.id.button_modify_health:
-            case R.id.button_modify_initiative:
-            case R.id.button_modify_speed:
-                mPressedButton = (Button) view;
-                showModifyElementDialog();
-                break;
-            case R.id.button_modify_weapon1:
-            case R.id.button_modify_weapon2:
-            case R.id.button_modify_weapon3:
-                mPressedButton = (Button) view;
-                showModifyWeaponDialog();
-                break;
-            case R.id.button_modify_ammo:
-                mPressedButton = (Button) view;
-                showModifyAmmoDialog();
-                break;
             case R.id.button_add_ammo:
                 mPressedButton = (Button) view;
                 incrementAmmo(1);
@@ -171,30 +138,6 @@ public class CombatActivity extends Activity implements View.OnClickListener {
                             " + " + selectedWeapon.flat_damage + " " + selectedWeapon.damage_type);
                 }
                 break;
-            case WEAPON_2:
-                selectedWeapon = (Weapon) characterManager.getItem(characterManager.getWeaponName(1));
-                if (selectedWeapon != null) {
-                    mModifyElementText = (TextView) findViewById(R.id.text_weapon2_name);
-                    mModifyElementText.setText("" + selectedWeapon.name);
-                    mModifyElementText = (TextView) findViewById(R.id.text_weapon2_atk_bns);
-                    mModifyElementText.setText("+" + characterManager.getAttackBonus(1));
-                    mModifyElementText = (TextView) findViewById(R.id.text_weapon2_damage);
-                    mModifyElementText.setText("" + selectedWeapon.dice_num + "d" + selectedWeapon.dice_size +
-                            " + " + selectedWeapon.flat_damage + " " + selectedWeapon.damage_type);
-                }
-                break;
-            case WEAPON_3:
-                selectedWeapon = (Weapon) characterManager.getItem(characterManager.getWeaponName(2));
-                if (selectedWeapon != null) {
-                    mModifyElementText = (TextView) findViewById(R.id.text_weapon3_name);
-                    mModifyElementText.setText("" + selectedWeapon.name);
-                    mModifyElementText = (TextView) findViewById(R.id.text_weapon3_atk_bns);
-                    mModifyElementText.setText("+" + characterManager.getAttackBonus(2));
-                    mModifyElementText = (TextView) findViewById(R.id.text_weapon3_damage);
-                    mModifyElementText.setText("" + selectedWeapon.dice_num + "d" + selectedWeapon.dice_size +
-                            " + " + selectedWeapon.flat_damage + " " + selectedWeapon.damage_type);
-                }
-                break;
             case AMMO:
                 // Ammo
                 selectedAmmo = characterManager.getItem(characterManager.getAmmo());
@@ -235,20 +178,6 @@ public class CombatActivity extends Activity implements View.OnClickListener {
         LayoutInflater inflater = getLayoutInflater();
         mActiveView = inflater.inflate(R.layout.modify_element_layout, null);
         mModifyElementEdit = (EditText) mActiveView.findViewById(R.id.edit_modify_value);
-        switch (mPressedButton.getId()) {
-            case R.id.button_modify_armor:
-                mModifyElementText = (TextView) findViewById(R.id.value_armor);
-                break;
-            case R.id.button_modify_health:
-                mModifyElementText = (TextView) findViewById(R.id.value_health);
-                break;
-            case R.id.button_modify_initiative:
-                mModifyElementText = (TextView) findViewById(R.id.value_initiative);
-                break;
-            case R.id.button_modify_speed:
-                mModifyElementText = (TextView) findViewById(R.id.value_speed);
-                break;
-        }
     }
 
     private void showModifyWeaponDialog() {
@@ -325,37 +254,9 @@ public class CombatActivity extends Activity implements View.OnClickListener {
             CharacterManager characterManager = CharacterManager.getInstance();
             try {
                 switch (mPressedButton.getId()) {
-                    case R.id.button_modify_armor:
-                        characterManager.setArmor(Integer.parseInt(mModifyElementEdit.getText().toString()));
-                        updateUI(UpdateUIIds.ARMOR);
-                        break;
-                    case R.id.button_modify_health:
-                        characterManager.setHealth(Integer.parseInt(mModifyElementEdit.getText().toString()));
-                        updateUI(UpdateUIIds.HEALTH);
-                        break;
-                    case R.id.button_modify_initiative:
-                        characterManager.setInitiative(Integer.parseInt(mModifyElementEdit.getText().toString()));
-                        updateUI(UpdateUIIds.INITIATIVE);
-                        break;
-                    case R.id.button_modify_speed:
-                        characterManager.setSpeed(Integer.parseInt(mModifyElementEdit.getText().toString()));
-                        updateUI(UpdateUIIds.SPEED);
-                        break;
-                    case R.id.button_modify_weapon1:
-                        characterManager.setWeapon(selectedWeapon.name, Integer.parseInt(mModifyElementEdit.getText().toString()), 0);
-                        updateUI(UpdateUIIds.WEAPON_1);
-                        break;
-                    case R.id.button_modify_weapon2:
-                        characterManager.setWeapon(selectedWeapon.name, Integer.parseInt(mModifyElementEdit.getText().toString()), 1);
-                        updateUI(UpdateUIIds.WEAPON_2);
-                        break;
-                    case R.id.button_modify_weapon3:
+                    default:
                         characterManager.setWeapon(selectedWeapon.name, Integer.parseInt(mModifyElementEdit.getText().toString()), 2);
                         updateUI(UpdateUIIds.WEAPON_3);
-                        break;
-                    case R.id.button_modify_ammo:
-                        characterManager.setAmmo(selectedAmmo.name);
-                        updateUI(UpdateUIIds.AMMO);
                         break;
                 }
             } catch (Exception e) {

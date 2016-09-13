@@ -43,7 +43,7 @@ public class NotesActivity extends ActionBarActivity {
 
     @Override
     protected void onPause() {
-        super.onResume();
+        super.onPause();
         CharacterManager characterManager = CharacterManager.getInstance();
         characterManager.setNotes(mNotes.getText().toString());
         imm.hideSoftInputFromWindow(mNotes.getWindowToken(), 0);

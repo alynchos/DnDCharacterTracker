@@ -80,7 +80,6 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
         if (getArguments() != null) {
             RefreshUI = getArguments().getBoolean(REFRESH_UI);
         }
-        // TODO: CHECK IF THIS WORKS
         CharacterManager characterManager = CharacterManager.getInstance();
         if (characterManager.getCharacter() == null) {
             characterManager.setCharacter(new BaseCharacter());
@@ -91,76 +90,8 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_character_sheet_layout, container, false);
-        // Buttons
-        mButtonModifyCharacter = (Button) view.findViewById(R.id.button_modify_character);
-        mButtonModifyCharacter.setOnClickListener(this);
-        // Abilities
-        LinearLayout layout_stats = (LinearLayout) view.findViewById(R.id.layout_stats);
-        mTextViewAbility[0] = (TextView) layout_stats.findViewById(R.id.include_ability_strength).findViewById(R.id.stat_ability_num);
-        mTextViewAbilityMod[0] = (TextView) layout_stats.findViewById(R.id.include_ability_strength).findViewById(R.id.mod_ability_num);
-        mTextViewAbility[1] = (TextView) layout_stats.findViewById(R.id.include_ability_dexterity).findViewById(R.id.stat_ability_num);
-        mTextViewAbilityMod[1] = (TextView) layout_stats.findViewById(R.id.include_ability_dexterity).findViewById(R.id.mod_ability_num);
-        mTextViewAbility[2] = (TextView) layout_stats.findViewById(R.id.include_ability_constitution).findViewById(R.id.stat_ability_num);
-        mTextViewAbilityMod[2] = (TextView) layout_stats.findViewById(R.id.include_ability_constitution).findViewById(R.id.mod_ability_num);
-        mTextViewAbility[3] = (TextView) layout_stats.findViewById(R.id.include_ability_intelligence).findViewById(R.id.stat_ability_num);
-        mTextViewAbilityMod[3] = (TextView) layout_stats.findViewById(R.id.include_ability_intelligence).findViewById(R.id.mod_ability_num);
-        mTextViewAbility[4] = (TextView) layout_stats.findViewById(R.id.include_ability_wisdom).findViewById(R.id.stat_ability_num);
-        mTextViewAbilityMod[4] = (TextView) layout_stats.findViewById(R.id.include_ability_wisdom).findViewById(R.id.mod_ability_num);
-        mTextViewAbility[5] = (TextView) layout_stats.findViewById(R.id.include_ability_charisma).findViewById(R.id.stat_ability_num);
-        mTextViewAbilityMod[5] = (TextView) layout_stats.findViewById(R.id.include_ability_charisma).findViewById(R.id.mod_ability_num);
-        // Skills
-        mSkillProfs[0] = (CheckBox) view.findViewById(R.id.char_acrobatics);
-        mSkillProfs[1] = (CheckBox) view.findViewById(R.id.char_animal_handling);
-        mSkillProfs[2] = (CheckBox) view.findViewById(R.id.char_arcana);
-        mSkillProfs[3] = (CheckBox) view.findViewById(R.id.char_athletics);
-        mSkillProfs[4] = (CheckBox) view.findViewById(R.id.char_deception);
-        mSkillProfs[5] = (CheckBox) view.findViewById(R.id.char_history);
-        mSkillProfs[6] = (CheckBox) view.findViewById(R.id.char_insight);
-        mSkillProfs[7] = (CheckBox) view.findViewById(R.id.char_intimidation);
-        mSkillProfs[8] = (CheckBox) view.findViewById(R.id.char_investigation);
-        mSkillProfs[9] = (CheckBox) view.findViewById(R.id.char_medicine);
-        mSkillProfs[10] = (CheckBox) view.findViewById(R.id.char_nature);
-        mSkillProfs[11] = (CheckBox) view.findViewById(R.id.char_perception);
-        mSkillProfs[12] = (CheckBox) view.findViewById(R.id.char_performance);
-        mSkillProfs[13] = (CheckBox) view.findViewById(R.id.char_persuasion);
-        mSkillProfs[14] = (CheckBox) view.findViewById(R.id.char_religion);
-        mSkillProfs[15] = (CheckBox) view.findViewById(R.id.char_sleight_of_hand);
-        mSkillProfs[16] = (CheckBox) view.findViewById(R.id.char_stealth);
-        mSkillProfs[17] = (CheckBox) view.findViewById(R.id.char_survival);
-        // Mods
-        mSkillMods[0] = (TextView) view.findViewById(R.id.mod_acrobatics);
-        mSkillMods[1] = (TextView) view.findViewById(R.id.mod_animal_handling);
-        mSkillMods[2] = (TextView) view.findViewById(R.id.mod_arcana);
-        mSkillMods[3] = (TextView) view.findViewById(R.id.mod_athletics);
-        mSkillMods[4] = (TextView) view.findViewById(R.id.mod_deception);
-        mSkillMods[5] = (TextView) view.findViewById(R.id.mod_history);
-        mSkillMods[6] = (TextView) view.findViewById(R.id.mod_insight);
-        mSkillMods[7] = (TextView) view.findViewById(R.id.mod_intimidation);
-        mSkillMods[8] = (TextView) view.findViewById(R.id.mod_investigation);
-        mSkillMods[9] = (TextView) view.findViewById(R.id.mod_medicine);
-        mSkillMods[10] = (TextView) view.findViewById(R.id.mod_nature);
-        mSkillMods[11] = (TextView) view.findViewById(R.id.mod_perception);
-        mSkillMods[12] = (TextView) view.findViewById(R.id.mod_performance);
-        mSkillMods[13] = (TextView) view.findViewById(R.id.mod_persuasion);
-        mSkillMods[14] = (TextView) view.findViewById(R.id.mod_religion);
-        mSkillMods[15] = (TextView) view.findViewById(R.id.mod_sleight_of_hand);
-        mSkillMods[16] = (TextView) view.findViewById(R.id.mod_stealth);
-        mSkillMods[17] = (TextView) view.findViewById(R.id.mod_survival);
-        // Proficiency
-        mProf = (TextView) view.findViewById(R.id.char_proficiency);
-        // Saving Throws
-        mTextViewSaveMod[0] = (TextView) view.findViewById(R.id.mod_saving_throws_str);
-        mTextViewSaveMod[1] = (TextView) view.findViewById(R.id.mod_saving_throws_dex);
-        mTextViewSaveMod[2] = (TextView) view.findViewById(R.id.mod_saving_throws_con);
-        mTextViewSaveMod[3] = (TextView) view.findViewById(R.id.mod_saving_throws_int);
-        mTextViewSaveMod[4] = (TextView) view.findViewById(R.id.mod_saving_throws_wis);
-        mTextViewSaveMod[5] = (TextView) view.findViewById(R.id.mod_saving_throws_chr);
-        mCheckBoxSaveProfs[0] = (CheckBox) view.findViewById(R.id.char_saving_throw_str);
-        mCheckBoxSaveProfs[1] = (CheckBox) view.findViewById(R.id.char_saving_throw_dex);
-        mCheckBoxSaveProfs[2] = (CheckBox) view.findViewById(R.id.char_saving_throw_con);
-        mCheckBoxSaveProfs[3] = (CheckBox) view.findViewById(R.id.char_saving_throw_int);
-        mCheckBoxSaveProfs[4] = (CheckBox) view.findViewById(R.id.char_saving_throw_wis);
-        mCheckBoxSaveProfs[5] = (CheckBox) view.findViewById(R.id.char_saving_throw_chr);
+
+        initView(view);
 
         CharacterManager characterManager = CharacterManager.getInstance();
         if (characterManager.getCharacter() == null) {
@@ -218,6 +149,85 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
 
     /* Private Helpers */
 
+    private void initView(View view){
+        // Buttons
+        mButtonModifyCharacter = (Button) view.findViewById(R.id.button_modify_character);
+        mButtonModifyCharacter.setOnClickListener(this);
+        // Abilities
+        LinearLayout layout_stats = (LinearLayout) view.findViewById(R.id.layout_stats);
+        mTextViewAbility[0] = (TextView) layout_stats.findViewById(R.id.include_ability_strength).findViewById(R.id.stat_ability_num);
+        mTextViewAbilityMod[0] = (TextView) layout_stats.findViewById(R.id.include_ability_strength).findViewById(R.id.mod_ability_num);
+        ((TextView) layout_stats.findViewById(R.id.include_ability_strength).findViewById(R.id.text_ability_name)).setText(R.string.ability_name_strength);
+        mTextViewAbility[1] = (TextView) layout_stats.findViewById(R.id.include_ability_dexterity).findViewById(R.id.stat_ability_num);
+        mTextViewAbilityMod[1] = (TextView) layout_stats.findViewById(R.id.include_ability_dexterity).findViewById(R.id.mod_ability_num);
+        ((TextView) layout_stats.findViewById(R.id.include_ability_dexterity).findViewById(R.id.text_ability_name)).setText(R.string.ability_name_dexterity);
+        mTextViewAbility[2] = (TextView) layout_stats.findViewById(R.id.include_ability_constitution).findViewById(R.id.stat_ability_num);
+        mTextViewAbilityMod[2] = (TextView) layout_stats.findViewById(R.id.include_ability_constitution).findViewById(R.id.mod_ability_num);
+        ((TextView) layout_stats.findViewById(R.id.include_ability_constitution).findViewById(R.id.text_ability_name)).setText(R.string.ability_name_constitution);
+        mTextViewAbility[3] = (TextView) layout_stats.findViewById(R.id.include_ability_intelligence).findViewById(R.id.stat_ability_num);
+        mTextViewAbilityMod[3] = (TextView) layout_stats.findViewById(R.id.include_ability_intelligence).findViewById(R.id.mod_ability_num);
+        ((TextView) layout_stats.findViewById(R.id.include_ability_intelligence).findViewById(R.id.text_ability_name)).setText(R.string.ability_name_intelligence);
+        mTextViewAbility[4] = (TextView) layout_stats.findViewById(R.id.include_ability_wisdom).findViewById(R.id.stat_ability_num);
+        mTextViewAbilityMod[4] = (TextView) layout_stats.findViewById(R.id.include_ability_wisdom).findViewById(R.id.mod_ability_num);
+        ((TextView) layout_stats.findViewById(R.id.include_ability_wisdom).findViewById(R.id.text_ability_name)).setText(R.string.ability_name_wisdom);
+        mTextViewAbility[5] = (TextView) layout_stats.findViewById(R.id.include_ability_charisma).findViewById(R.id.stat_ability_num);
+        mTextViewAbilityMod[5] = (TextView) layout_stats.findViewById(R.id.include_ability_charisma).findViewById(R.id.mod_ability_num);
+        ((TextView) layout_stats.findViewById(R.id.include_ability_charisma).findViewById(R.id.text_ability_name)).setText(R.string.ability_name_charisma);
+        // Skills
+        mSkillProfs[0] = (CheckBox) view.findViewById(R.id.char_acrobatics);
+        mSkillProfs[1] = (CheckBox) view.findViewById(R.id.char_animal_handling);
+        mSkillProfs[2] = (CheckBox) view.findViewById(R.id.char_arcana);
+        mSkillProfs[3] = (CheckBox) view.findViewById(R.id.char_athletics);
+        mSkillProfs[4] = (CheckBox) view.findViewById(R.id.char_deception);
+        mSkillProfs[5] = (CheckBox) view.findViewById(R.id.char_history);
+        mSkillProfs[6] = (CheckBox) view.findViewById(R.id.char_insight);
+        mSkillProfs[7] = (CheckBox) view.findViewById(R.id.char_intimidation);
+        mSkillProfs[8] = (CheckBox) view.findViewById(R.id.char_investigation);
+        mSkillProfs[9] = (CheckBox) view.findViewById(R.id.char_medicine);
+        mSkillProfs[10] = (CheckBox) view.findViewById(R.id.char_nature);
+        mSkillProfs[11] = (CheckBox) view.findViewById(R.id.char_perception);
+        mSkillProfs[12] = (CheckBox) view.findViewById(R.id.char_performance);
+        mSkillProfs[13] = (CheckBox) view.findViewById(R.id.char_persuasion);
+        mSkillProfs[14] = (CheckBox) view.findViewById(R.id.char_religion);
+        mSkillProfs[15] = (CheckBox) view.findViewById(R.id.char_sleight_of_hand);
+        mSkillProfs[16] = (CheckBox) view.findViewById(R.id.char_stealth);
+        mSkillProfs[17] = (CheckBox) view.findViewById(R.id.char_survival);
+        // Mods
+        mSkillMods[0] = (TextView) view.findViewById(R.id.mod_acrobatics);
+        mSkillMods[1] = (TextView) view.findViewById(R.id.mod_animal_handling);
+        mSkillMods[2] = (TextView) view.findViewById(R.id.mod_arcana);
+        mSkillMods[3] = (TextView) view.findViewById(R.id.mod_athletics);
+        mSkillMods[4] = (TextView) view.findViewById(R.id.mod_deception);
+        mSkillMods[5] = (TextView) view.findViewById(R.id.mod_history);
+        mSkillMods[6] = (TextView) view.findViewById(R.id.mod_insight);
+        mSkillMods[7] = (TextView) view.findViewById(R.id.mod_intimidation);
+        mSkillMods[8] = (TextView) view.findViewById(R.id.mod_investigation);
+        mSkillMods[9] = (TextView) view.findViewById(R.id.mod_medicine);
+        mSkillMods[10] = (TextView) view.findViewById(R.id.mod_nature);
+        mSkillMods[11] = (TextView) view.findViewById(R.id.mod_perception);
+        mSkillMods[12] = (TextView) view.findViewById(R.id.mod_performance);
+        mSkillMods[13] = (TextView) view.findViewById(R.id.mod_persuasion);
+        mSkillMods[14] = (TextView) view.findViewById(R.id.mod_religion);
+        mSkillMods[15] = (TextView) view.findViewById(R.id.mod_sleight_of_hand);
+        mSkillMods[16] = (TextView) view.findViewById(R.id.mod_stealth);
+        mSkillMods[17] = (TextView) view.findViewById(R.id.mod_survival);
+        // Proficiency
+        mProf = (TextView) view.findViewById(R.id.char_proficiency);
+        // Saving Throws
+        mTextViewSaveMod[0] = (TextView) view.findViewById(R.id.mod_saving_throws_str);
+        mTextViewSaveMod[1] = (TextView) view.findViewById(R.id.mod_saving_throws_dex);
+        mTextViewSaveMod[2] = (TextView) view.findViewById(R.id.mod_saving_throws_con);
+        mTextViewSaveMod[3] = (TextView) view.findViewById(R.id.mod_saving_throws_int);
+        mTextViewSaveMod[4] = (TextView) view.findViewById(R.id.mod_saving_throws_wis);
+        mTextViewSaveMod[5] = (TextView) view.findViewById(R.id.mod_saving_throws_chr);
+        mCheckBoxSaveProfs[0] = (CheckBox) view.findViewById(R.id.char_saving_throw_str);
+        mCheckBoxSaveProfs[1] = (CheckBox) view.findViewById(R.id.char_saving_throw_dex);
+        mCheckBoxSaveProfs[2] = (CheckBox) view.findViewById(R.id.char_saving_throw_con);
+        mCheckBoxSaveProfs[3] = (CheckBox) view.findViewById(R.id.char_saving_throw_int);
+        mCheckBoxSaveProfs[4] = (CheckBox) view.findViewById(R.id.char_saving_throw_wis);
+        mCheckBoxSaveProfs[5] = (CheckBox) view.findViewById(R.id.char_saving_throw_chr);
+    }
+
     private void modifyCharacterDialog() {
         logger.debug("Showing Character Modify Dialog");
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -273,11 +283,6 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
 
     private void fillCurrentModifierStats() {
         CharacterManager characterManager = CharacterManager.getInstance();
-        // Identity
-        String name = characterManager.getName();
-        String class_ = characterManager.getClass_();
-        String race = characterManager.getRace();
-        String align = characterManager.getAlign();
         // Abilities
         int temp[] = characterManager.getAbilities();
         mEditStr.setText("" + (temp[0] > 0 ? temp[0] : ""));
