@@ -17,6 +17,10 @@ public class Logger {
         if(LOG_LEVEL >= DEBUG) System.out.println("" + TAG + "[DEBUG]: " + mes);
     }
 
+    public void warn(String mes){
+        if(LOG_LEVEL >= WARN) System.out.println("" + TAG + "[WARN]: " + mes);
+    }
+
     public void error(String mes){
         if(LOG_LEVEL >= ERROR) System.err.println("" + TAG + "[ERROR]:  " + mes);
     }

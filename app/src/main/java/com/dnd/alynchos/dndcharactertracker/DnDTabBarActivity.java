@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
@@ -19,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
@@ -54,6 +57,7 @@ public class DnDTabBarActivity extends AppCompatActivity
     ViewConfiguration mViewConfiguration;
 
     /* Fragments */
+    private final String mCurrentFragmentTag = "FRAG_CURRENT";
     private final String mCharacterSheetFragmentTag = "FRAG_CHAR_SHEET";
     private final String mCombatFragmentTag = "FRAG_COMBAT";
     private final String mInventoryFragmentTag = "FRAG_INVENTORY";
@@ -111,27 +115,31 @@ public class DnDTabBarActivity extends AppCompatActivity
         public void onReceive(Context ctx, Intent intent) {
             if (intent.getAction().equals(CharacterManager.UPDATE_UI)) {
                 logger.debug("Update UI from broadcast");
-                CharacterSheetFragment csf = ((CharacterSheetFragment) getSupportFragmentManager().findFragmentByTag(mCharacterSheetFragmentTag));
-                if(csf != null) {
-                    csf.updateUI();
+                Fragment frag = getSupportFragmentManager().findFragmentByTag(mCurrentFragmentTag);
+                if (frag instanceof CharacterSheetFragment) {
+                    ((CharacterSheetFragment) frag).updateUI();
                     Toast.makeText(dndTabBarActivity, "Data Loaded", Toast.LENGTH_SHORT).show();
                 }
             } else if (intent.getAction().equals(CharacterManager.UPDATE_INV_UI)) {
                 logger.debug("Update Inventory UI from broadcast");
-                InventoryFragment inventoryFragment = ((InventoryFragment) getSupportFragmentManager().findFragmentByTag(mInventoryFragmentTag));
-                if(inventoryFragment != null) {
-                    inventoryFragment.updateInventoryList();
-                    inventoryFragment.updateHeader();
+                Fragment frag = getSupportFragmentManager().findFragmentByTag(mCurrentFragmentTag);
+                if (frag instanceof InventoryFragment) {
+                    ((InventoryFragment) frag).updateInventoryList();
+                    ((InventoryFragment) frag).updateHeader();
                     //Toast.makeText(dndTabBarActivity, "Inventory Updated", Toast.LENGTH_SHORT).show();
                 }
             } else if (intent.getAction().equals(CharacterManager.CLEAR_INV)) {
                 logger.debug("Clear Inventory broadcast");
-                InventoryFragment inventoryFragment = ((InventoryFragment) getSupportFragmentManager().findFragmentByTag(mInventoryFragmentTag));
-                if(inventoryFragment != null) {
-                    inventoryFragment.updateInventoryList();
-                    inventoryFragment.updateHeader();
+                Fragment frag = getSupportFragmentManager().findFragmentByTag(mCurrentFragmentTag);
+                if (frag instanceof InventoryFragment) {
+                    ((InventoryFragment) frag).updateInventoryList();
+                    ((InventoryFragment) frag).updateHeader();
                     //Toast.makeText(dndTabBarActivity, "Inventory Deleted", Toast.LENGTH_SHORT).show();
                 }
+            } else if (intent.getAction().equals(CharacterManager.HIDE_KEYBOARD)) {
+                logger.debug("Hiding Keyboard");
+                hideKeyboard();
+                //imm.showSoftInput(mNotes, InputMethodManager.SHOW_IMPLICIT);
             }
         }
     };
@@ -180,6 +188,8 @@ public class DnDTabBarActivity extends AppCompatActivity
             registerReceiver(updateUIReceiver, new IntentFilter(CharacterManager.UPDATE_UI));
             registerReceiver(updateUIReceiver, new IntentFilter(CharacterManager.UPDATE_INV_UI));
             registerReceiver(updateUIReceiver, new IntentFilter(CharacterManager.CLEAR_INV));
+            registerReceiver(updateUIReceiver, new IntentFilter(CharacterManager.HIDE_KEYBOARD));
+            registerReceiver(updateUIReceiver, new IntentFilter(CharacterManager.SHOW_KEYBOARD));
             updateUIRegistered = true;
         }
         CharacterManager characterManager = CharacterManager.getInstance();
@@ -394,6 +404,12 @@ public class DnDTabBarActivity extends AppCompatActivity
         mHamburgerLayout = (DrawerLayout) findViewById(R.id.layout_main);
         mHamburgerToggle = new ActionBarDrawerToggle(this, mHamburgerLayout, R.string.but_open_hamburger, R.string.but_close_hamburger) {
 
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                // This calls the method ten bazillion times but it works so w.e
+                hideKeyboard();
+            }
+
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
@@ -441,38 +457,33 @@ public class DnDTabBarActivity extends AppCompatActivity
 
     private void switchTab(Tab tab, Direction dir) {
         Fragment fragmentToChange = null;
-        String fragmentTag = "";
         switch (tab) {
             case character:
                 mCurrentTab = Tab.character;
                 mTextViewTitle.setText(getString(R.string.text_character_title));
                 fragmentToChange = new CharacterSheetFragment();
-                fragmentTag = mCharacterSheetFragmentTag;
                 break;
             case combat:
                 mCurrentTab = Tab.combat;
                 mTextViewTitle.setText(getString(R.string.text_combat_title));
                 fragmentToChange = new CombatFragment();
-                fragmentTag = mCombatFragmentTag;
                 break;
             case inventory:
                 mCurrentTab = Tab.inventory;
                 mTextViewTitle.setText(getString(R.string.text_inventory_title));
                 fragmentToChange = new InventoryFragment();
-                fragmentTag = mInventoryFragmentTag;
                 break;
             case notes:
                 mCurrentTab = Tab.notes;
                 mTextViewTitle.setText(getString(R.string.text_notes_title));
                 fragmentToChange = new NotesFragment();
-                fragmentTag = mNotesFragmentTag;
                 break;
             default:
                 logger.error("Unacceptable tab selected");
                 break;
         }
         int intro_anim = 0, outro_anim = 0;
-        switch(dir){
+        switch (dir) {
             case left:
                 //intro_anim = android.R.anim.slide_out_right;
                 //outro_anim = android.R.anim.fade_out;
@@ -489,9 +500,9 @@ public class DnDTabBarActivity extends AppCompatActivity
                 break;
         }
         getSupportFragmentManager().beginTransaction()
-        .setCustomAnimations(intro_anim, outro_anim)
-        .replace(R.id.fragment_body, fragmentToChange, fragmentTag)
-        .commit();
+                .setCustomAnimations(intro_anim, outro_anim)
+                .replace(R.id.fragment_body, fragmentToChange, mCurrentFragmentTag)
+                .commit();
     }
 
     private Tab getNextTab() {
@@ -513,6 +524,24 @@ public class DnDTabBarActivity extends AppCompatActivity
                 logger.error("Unacceptable tab selected");
                 return Tab.character;
         }
+    }
+
+    private void hideKeyboard() {
+        View view = getCurrentFocus();
+        if (view == null) return;
+        ResultReceiver resultReceiver = new ResultReceiver(new Handler()) {
+            @Override
+            protected void onReceiveResult(int resultCode, Bundle resultData) {
+                logger.debug("Receiver result: " + resultCode);
+                switch (resultCode) {
+                    case InputMethodManager.RESULT_HIDDEN:
+                    case InputMethodManager.RESULT_UNCHANGED_HIDDEN:
+                        break;
+                }
+            }
+        };
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0, resultReceiver);
     }
 
     /* End Setup Helper Methods */
