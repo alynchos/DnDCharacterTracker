@@ -78,7 +78,10 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
                     FeedEntry.COLUMN_INITIATIVE + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_SPEED + TEXT_TYPE + COMMA_SEP +
                     // Money
-                    FeedEntry.COLUMN_GOLD + TEXT_TYPE +
+                    FeedEntry.COLUMN_COPPER + TEXT_TYPE + COMMA_SEP +
+                    FeedEntry.COLUMN_SILVER + TEXT_TYPE + COMMA_SEP +
+                    FeedEntry.COLUMN_GOLD + TEXT_TYPE + COMMA_SEP +
+                    FeedEntry.COLUMN_PLATINUM + TEXT_TYPE +
                     // Any other options for the CREATE command
                     " )";
 
@@ -323,6 +326,11 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_EXPERIENCE}, defaultNum);
         // Proficiency
         insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_PROFICIENCY}, defaultNum);
+        // Currency
+        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_COPPER}, defaultNum);
+        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_SILVER}, defaultNum);
+        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_GOLD}, defaultNum);
+        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_PLATINUM}, defaultNum);
     }
 
     private void createInventoryTable(SQLiteDatabase db) {
@@ -384,7 +392,10 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         public static final String COLUMN_INITIATIVE = "initiative";
         public static final String COLUMN_SPEED = "speed";
         // Money
+        public static final String COLUMN_COPPER = "char_copper";
+        public static final String COLUMN_SILVER = "char_silver";
         public static final String COLUMN_GOLD = "char_gold";
+        public static final String COLUMN_PLATINUM = "char_platinum";
 
         // Inventory Table
         public static final String TABLE_INVENTORY = "inventory";

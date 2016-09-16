@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.util.Pair;
 import android.widget.Toast;
 
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
@@ -13,7 +12,6 @@ import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Weapon;
 import com.dnd.alynchos.dndcharactertracker.SaveData.FeedReaderDbHelper;
 
 import java.util.LinkedList;
-import java.util.Set;
 
 /**
  * Created by Alex Lynchosky on 12/22/2014.
@@ -29,11 +27,23 @@ public class CharacterManager {
     public static final String UPDATE_INV_UI = "com.dnd.alynchos.UPDATE_INV_UI";
     public static final String CLEAR_CHAR = "com.dnd.alynchos.CLEAR_CHAR";
     public static final String CLEAR_INV = "com.dnd.alynchos.CLEAR_INV";
+    public static final String HIDE_KEYBOARD = "com.dnd.alynchos.HIDE_KEYBOARD";
+    public static final String SHOW_KEYBOARD = "com.dnd.alynchos.HIDE_KEYBOARD";
+
+    // Intent Extras
+    public static final String KEYBOARD_VIEW = "viewToHideFrom";
 
     // Constants
     public static final int ACR = 0, ANI = 1, ARC = 2, ATH = 3, DEC = 4, HIS = 5, INS = 6,
             INTI = 7, INV = 8, MED = 9, NAT = 10, PER = 11, PERF = 12, PERS = 13,
             REL = 14, SLE = 15, STE = 16, SUR = 17;
+
+    public enum CurrencyType {
+        copper,
+        silver,
+        gold,
+        platinum
+    }
 
     // Keep track of level steps
     public static final int[] LEVEL_CAPS = {300, 900, 2700, 6500};
@@ -363,28 +373,28 @@ public class CharacterManager {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    // (0 = copper, 1 = silver, 2 = electrum, 3 = gold, 4 = platinum)
-    public void addMoney(int amount, int type) {
-        double to_add = 0;
+    public void setCurrency(int amount, CurrencyType type) {
         switch (type) {
-            case 0:
-                to_add = (double) amount * (0.005);
+            case copper:
+                if (amount < 0) mCharacter.copper = 0;
+                else mCharacter.copper = amount;
                 break;
-            case 1:
-                to_add = (double) amount * (0.05);
+            case silver:
+                if (amount < 0) mCharacter.silver = 0;
+                else mCharacter.silver = amount;
                 break;
-            case 2:
-                to_add = (double) amount * (0.5);
+            case gold:
+                if (amount < 0) mCharacter.gold = 0;
+                else mCharacter.gold = amount;
                 break;
-            case 3:
-                to_add = (double) amount;
+            case platinum:
+                if (amount < 0) mCharacter.plat = 0;
+                else mCharacter.plat = amount;
                 break;
-            case 4:
-                to_add = (double) amount * (5);
+            default:
+                logger.error("Improper currency type: " + type);
                 break;
         }
-        if (mCharacter.gold + to_add < 0) mCharacter.gold = 0;
-        else mCharacter.gold += to_add;
     }
 
     public void deleteInventory() {
@@ -404,30 +414,8 @@ public class CharacterManager {
         return mCharacter.getCarryWeight();
     }
 
-    public int[] getCurrentMoney() {
-        int p = 0, g = 0, e = 0, s = 0, c = 0;
-        double money = mCharacter.gold;
-        while (money - 5 >= 0) {
-            money -= 5;
-            p++;
-        }
-        while (money - 1 >= 0) {
-            money--;
-            g++;
-        }
-        while (money - 0.5 >= 0) {
-            money -= 0.5;
-            e++;
-        }
-        while (money - 0.05 >= 0) {
-            money -= 0.05;
-            s++;
-        }
-        while (money - 0.005 >= 0) {
-            money -= 0.005;
-            c++;
-        }
-        return new int[]{c, s, e, g, p};
+    public int[] getCurrency() {
+        return new int[]{mCharacter.copper, mCharacter.silver, mCharacter.gold, mCharacter.plat};
     }
 
     public String[] getInventoryItemNames() {
@@ -587,7 +575,7 @@ public class CharacterManager {
                 saveAbilities();
                 saveCombat();
                 saveExperience();
-                saveGold();
+                saveCurrency();
                 saveIdentity();
                 saveNotes();
                 saveProficiency();
@@ -742,13 +730,19 @@ public class CharacterManager {
                 " +" + mCharacter.attack_bonus[1] + " +" + mCharacter.attack_bonus[2] + " Weapons: " +
                 mCharacter.weapons[0] + " " + mCharacter.weapons[1] + mCharacter.weapons[2] + " Ammo: " +
                 mCharacter.ammo);
-        // Gold
-        columns = new String[1];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_GOLD;
+        // Currency
+        columns = new String[4];
+        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_COPPER;
+        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_SILVER;
+        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_GOLD;
+        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_PLATINUM;
         retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns);
         retrieve.moveToFirst();
-        mCharacter.gold = retrieve.getDouble(0);
-        logger.debug("DB Gold: " + mCharacter.gold);
+        mCharacter.copper = retrieve.getInt(0);
+        mCharacter.silver = retrieve.getInt(1);
+        mCharacter.gold = retrieve.getInt(2);
+        mCharacter.plat = retrieve.getInt(3);
+        logger.debug("DB Currency: [" + mCharacter.copper + ", " + mCharacter.silver + ", " +mCharacter.gold + ", " +mCharacter.plat + "]");
         // Notes
         columns = new String[1];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_NOTES;
@@ -867,6 +861,7 @@ public class CharacterManager {
         columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_INT;
         columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_WIS;
         columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_CHR;
+        assert feedReaderDbHelper != null;
         feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
     }
 
@@ -882,6 +877,7 @@ public class CharacterManager {
         columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_ARMOR;
         columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_INITIATIVE;
         columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_SPEED;
+        assert feedReaderDbHelper != null;
         feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
         save = new Object[7];
         for (int i = 0; i < 3; i++) {
@@ -905,18 +901,26 @@ public class CharacterManager {
     private void saveExperience() {
         FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
         Object save[] = new Object[1];
-        save[0] = new Integer(mCharacter.experience);
+        save[0] = mCharacter.experience;
         String columns[] = new String[1];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_EXPERIENCE;
+        assert feedReaderDbHelper != null;
         feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
     }
 
-    private void saveGold() {
+    private void saveCurrency() {
         FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Object save[] = new Object[1];
-        save[0] = new Double(mCharacter.gold);
-        String columns[] = new String[1];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_GOLD;
+        Object save[] = new Object[4];
+        save[0] = mCharacter.copper;
+        save[1] = mCharacter.silver;
+        save[2] = mCharacter.gold;
+        save[3] = mCharacter.plat;
+        String columns[] = new String[4];
+        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_COPPER;
+        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_SILVER;
+        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_GOLD;
+        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_PLATINUM;
+        assert feedReaderDbHelper != null;
         feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
     }
 
@@ -932,6 +936,7 @@ public class CharacterManager {
         columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_RACE;
         columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_CLASS;
         columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_ALIGN;
+        assert feedReaderDbHelper != null;
         feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
     }
 

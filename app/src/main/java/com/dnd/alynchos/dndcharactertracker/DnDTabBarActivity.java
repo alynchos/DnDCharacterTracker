@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -75,8 +74,8 @@ public class DnDTabBarActivity extends AppCompatActivity
     private LinearLayout mCurrencyLayout;
 
     /* Menu HUD */
-    private RelativeLayout mRelativeLayoutMenuHUD;
-    private ImageButton mButtonHamburgerMenu;
+    private LinearLayout mLinearLayoutMenuHUD;
+    private LinearLayout mButtonHamburgerMenu; // LinearLayout is the wrapper to increase clickbox size
     private TextView mTextViewTitle;
     private Tab mCurrentTab = Tab.character;
 
@@ -115,6 +114,7 @@ public class DnDTabBarActivity extends AppCompatActivity
         public void onReceive(Context ctx, Intent intent) {
             if (intent.getAction().equals(CharacterManager.UPDATE_UI)) {
                 logger.debug("Update UI from broadcast");
+                updateHamburgerMenuInfo();
                 Fragment frag = getSupportFragmentManager().findFragmentByTag(mCurrentFragmentTag);
                 if (frag instanceof CharacterSheetFragment) {
                     ((CharacterSheetFragment) frag).updateUI();
@@ -215,7 +215,7 @@ public class DnDTabBarActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.but_hamburger_menu:
+            case R.id.layout_hamburger_menu:
                 mHamburgerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.include_currency_layout:
@@ -344,20 +344,33 @@ public class DnDTabBarActivity extends AppCompatActivity
                                 CharSequence gold_val,
                                 CharSequence silver_val,
                                 CharSequence copper_val) {
+        CharacterManager characterManager = CharacterManager.getInstance();
         if (plat_val == null || plat_val.length() == 0)
             mLinearLayoutPlat.setVisibility(View.INVISIBLE);
-        else mLinearLayoutPlat.setVisibility(View.VISIBLE);
+        else {
+            mLinearLayoutPlat.setVisibility(View.VISIBLE);
+            characterManager.setCurrency(Integer.parseInt(plat_val.toString()), CharacterManager.CurrencyType.platinum);
+        }
 
         if (gold_val == null || gold_val.length() == 0)
             mLinearLayoutGold.setVisibility(View.INVISIBLE);
-        else mLinearLayoutGold.setVisibility(View.VISIBLE);
+        else {
+            mLinearLayoutGold.setVisibility(View.VISIBLE);
+            characterManager.setCurrency(Integer.parseInt(gold_val.toString()), CharacterManager.CurrencyType.gold);
+        }
 
         if (silver_val == null || silver_val.length() == 0)
             mLinearLayoutSilver.setVisibility(View.INVISIBLE);
-        else mLinearLayoutSilver.setVisibility(View.VISIBLE);
+        else {
+            mLinearLayoutSilver.setVisibility(View.VISIBLE);
+            characterManager.setCurrency(Integer.parseInt(silver_val.toString()), CharacterManager.CurrencyType.silver);
+        }
 
         if (copper_val == null || copper_val.length() == 0) {
             copper_val = "0";
+        }
+        else {
+            characterManager.setCurrency(Integer.parseInt(copper_val.toString()), CharacterManager.CurrencyType.copper);
         }
         mTextViewPlatVal.setText(plat_val);
         mTextViewGoldVal.setText(gold_val);
@@ -365,15 +378,23 @@ public class DnDTabBarActivity extends AppCompatActivity
         mTextViewCopperVal.setText(copper_val);
     }
 
+    private void updateHamburgerMenuInfo() {
+        CharacterManager characterManager = CharacterManager.getInstance();
+        // TODO: CHARACTER IDENTITY
+        // Currency
+        int[] currency = characterManager.getCurrency();
+        updateCurrency(String.format("%s", currency[3]), String.format("%s", currency[2]), String.format("%s", currency[1]), String.format("%s", currency[0]));
+    }
+
     /* End Private Helper Methods */
 
     /* Setup Helper Methods */
 
     private void setupMenuHUD() {
-        mRelativeLayoutMenuHUD = (RelativeLayout) findViewById(R.id.include_menu_hud);
-        assert mRelativeLayoutMenuHUD != null;
-        mTextViewTitle = (TextView) mRelativeLayoutMenuHUD.findViewById(R.id.text_screen_title);
-        mButtonHamburgerMenu = (ImageButton) mRelativeLayoutMenuHUD.findViewById(R.id.but_hamburger_menu);
+        mLinearLayoutMenuHUD = (LinearLayout) findViewById(R.id.include_menu_hud);
+        assert mLinearLayoutMenuHUD != null;
+        mTextViewTitle = (TextView) mLinearLayoutMenuHUD.findViewById(R.id.text_screen_title);
+        mButtonHamburgerMenu = (LinearLayout) mLinearLayoutMenuHUD.findViewById(R.id.layout_hamburger_menu);
         mButtonHamburgerMenu.setOnClickListener(this);
     }
 

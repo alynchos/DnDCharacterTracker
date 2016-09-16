@@ -24,7 +24,7 @@ public class BaseCharacter {
     public String weapons[] = new String[3];
     public String ammo;
     public int str, dex, con, intel, wis, chr;
-    public double gold;
+    public int plat, gold, silver, copper;
     public int experience, level = 1;
     public int proficiency;
     public String personality_traits, ideals, bonds, flaws;
