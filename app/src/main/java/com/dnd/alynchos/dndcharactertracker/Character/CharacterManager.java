@@ -105,11 +105,24 @@ public class CharacterManager {
         mCharacter.health = health;
     }
 
-    public void setIdentity(String identity[]) {
-        mCharacter.name = identity[0];
-        mCharacter.race = identity[1];
-        mCharacter.class_ = identity[2];
-        mCharacter.align = identity[3];
+    public void setAlignment(String val) {
+        mCharacter.align = val;
+    }
+
+    public void setBackground(String val) {
+        mCharacter.background = val;
+    }
+
+    public void setClass_(String val) {
+        mCharacter.class_ = val;
+    }
+
+    public void setName(String val) {
+        mCharacter.name = val;
+    }
+
+    public void setRace(String val) {
+        mCharacter.race = val;
     }
 
     public void setInitiative(int initiative) {
@@ -207,6 +220,11 @@ public class CharacterManager {
     public String getAlign() {
         if(mCharacter.align == null) mCharacter.align = " ";
         return mCharacter.align;
+    }
+
+    public String getBackground() {
+        if(mCharacter.background == null) mCharacter.background = " ";
+        return mCharacter.background;
     }
 
     public String getNotes(){
@@ -598,11 +616,12 @@ public class CharacterManager {
         Cursor retrieve;
         String columns[];
         // Identity
-        columns = new String[4];
+        columns = new String[5];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_NAME;
         columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_RACE;
         columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_CLASS;
         columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_ALIGN;
+        columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_BACKGROUND;
         assert feedReaderDbHelper != null;
         retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns);
         retrieve.moveToFirst();
@@ -926,16 +945,18 @@ public class CharacterManager {
 
     private void saveIdentity() {
         FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Object save[] = new Object[4];
+        Object save[] = new Object[5];
         save[0] = mCharacter.name;
         save[1] = mCharacter.race;
         save[2] = mCharacter.class_;
         save[3] = mCharacter.align;
-        String columns[] = new String[4];
+        save[4] = mCharacter.background;
+        String columns[] = new String[5];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_NAME;
         columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_RACE;
         columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_CLASS;
         columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_ALIGN;
+        columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_BACKGROUND;
         assert feedReaderDbHelper != null;
         feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
     }

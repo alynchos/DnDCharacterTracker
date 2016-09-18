@@ -35,6 +35,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
                     FeedEntry.COLUMN_RACE + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_CLASS + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_ALIGN + TEXT_TYPE + COMMA_SEP +
+                    FeedEntry.COLUMN_BACKGROUND + TEXT_TYPE + COMMA_SEP +
                     // Abilities
                     FeedEntry.COLUMN_STR + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_DEX + TEXT_TYPE + COMMA_SEP +
@@ -285,10 +286,11 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         Object defaultNum[] = new Object[1];
         defaultNum[0] = new Integer(0);
         // Identity
-        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_NAME}, new Object[]{new String("Name")});
-        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_RACE}, new Object[]{new String("Race")});
-        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_CLASS}, new Object[]{new String("Class")});
-        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_ALIGN}, new Object[]{new String("Alignment")});
+        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_NAME}, new Object[]{"Name"});
+        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_RACE}, new Object[]{"Race"});
+        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_CLASS}, new Object[]{"Class"});
+        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_ALIGN}, new Object[]{"Alignment"});
+        insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_BACKGROUND}, new Object[]{"Background"});
         // Abilities
         insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_STR}, defaultNum);
         insertData(db, FeedEntry.TABLE_CHARACTER, new String[]{FeedEntry.COLUMN_DEX}, defaultNum);
@@ -350,6 +352,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         public static final String COLUMN_RACE = "race";
         public static final String COLUMN_CLASS = "class";
         public static final String COLUMN_ALIGN = "align";
+        public static final String COLUMN_BACKGROUND = "background";
         // Abilities
         public static final String COLUMN_STR = "str";
         public static final String COLUMN_DEX = "dex";

@@ -19,12 +19,12 @@
     <string name="text_testing">Testing!</string>
 
     <!-- Hamburger Menu -->
-    <string name="hint_character_name">Enna Lynchosky</string>
-    <string name="hint_character_race">High Elf</string>
-    <string name="hint_character_class">Druid</string>
+    <string name="hint_character_name">Name</string>
+    <string name="hint_character_race">Race</string>
+    <string name="hint_character_class">Class</string>
     <string name="hint_character_gender">Gender</string>
-    <string name="hint_character_alignment">Chaotic Good</string>
-    <string name="hint_character_background">Outlander</string>
+    <string name="hint_character_alignment">Alignment</string>
+    <string name="hint_character_background">Background</string>
     <string name="text_character_info_screen">Character Info</string>
     <string name="text_combat_screen">Combat</string>
     <string name="text_inventory_screen">Inventory</string>

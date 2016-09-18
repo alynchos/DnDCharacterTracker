@@ -36,6 +36,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_gravity="start"
+        android:clickable="true"
         android:background="@color/off_white">
 
         <include layout="@layout/character_info_layout"

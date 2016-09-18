@@ -18,6 +18,7 @@ public class BaseCharacter {
     public String race = " ";
     public String class_ = " ";
     public String align = " ";
+    public String background = " ";
     public int age;
     public int health, armor, initiative, speed;
     public int attack_bonus[] = new int[3];

@@ -285,12 +285,12 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
         CharacterManager characterManager = CharacterManager.getInstance();
         // Abilities
         int temp[] = characterManager.getAbilities();
-        mEditStr.setText("" + (temp[0] > 0 ? temp[0] : ""));
-        mEditDex.setText("" + (temp[1] > 0 ? temp[1] : ""));
-        mEditCon.setText("" + (temp[2] > 0 ? temp[2] : ""));
-        mEditInt.setText("" + (temp[3] > 0 ? temp[3] : ""));
-        mEditWis.setText("" + (temp[4] > 0 ? temp[4] : ""));
-        mEditChr.setText("" + (temp[5] > 0 ? temp[5] : ""));
+        mEditStr.setText(String.format("%s", temp[0] > 0 ? temp[0] : ""));
+        mEditDex.setText(String.format("%s", temp[1] > 0 ? temp[1] : ""));
+        mEditCon.setText(String.format("%s", temp[2] > 0 ? temp[2] : ""));
+        mEditInt.setText(String.format("%s", temp[3] > 0 ? temp[3] : ""));
+        mEditWis.setText(String.format("%s", temp[4] > 0 ? temp[4] : ""));
+        mEditChr.setText(String.format("%s", temp[5] > 0 ? temp[5] : ""));
         // Skills
         temp = characterManager.getSkillProfs();
         for (int i = 0; i < temp.length; i++) {
@@ -298,7 +298,7 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
         }
         // Prof
         int getProf = characterManager.getProficiency();
-        mEditProf.setText("" + (getProf == 0 ? "" : getProf));
+        mEditProf.setText(String.format("%s", getProf == 0 ? "" : getProf));
         // Saving Throws
         temp = characterManager.getSaveProfs();
         for (int i = 0; i < temp.length; i++) {
@@ -313,20 +313,20 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
         // Stats
         int temp[] = characterManager.getAbilities();
         for (int i = 0; i < temp.length; i++) {
-            mTextViewAbility[i].setText("" + temp[i]);
+            mTextViewAbility[i].setText(String.format("%d", temp[i]));
         }
         // Mods
         temp = characterManager.getAbilityModifiers();
         for (int i = 0; i < temp.length; i++) {
             mTextViewAbilityMod[i].setTypeface(Typeface.MONOSPACE);
             if (temp[i] >= 10) {
-                mTextViewAbilityMod[i].setText("+" + temp[i]);
+                mTextViewAbilityMod[i].setText(String.format("+%d", temp[i]));
             } else if (temp[i] >= 0) {
-                mTextViewAbilityMod[i].setText("+" + temp[i] + " ");
+                mTextViewAbilityMod[i].setText(String.format("+%d ", temp[i]));
             } else if (temp[i] <= -10) {
                 mTextViewAbilityMod[i].setText(temp[i]);
             } else {
-                mTextViewAbilityMod[i].setText("" + temp[i] + " ");
+                mTextViewAbilityMod[i].setText(String.format("%d ", temp[i]));
             }
         }
         // Skills
@@ -339,21 +339,21 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
         for (int i = 0; i < temp.length; i++) {
             mSkillMods[i].setTypeface(Typeface.MONOSPACE);
             if (temp[i] >= 10) {
-                mSkillMods[i].setText("+" + temp[i]);
+                mSkillMods[i].setText(String.format("+%d", temp[i]));
             } else if (temp[i] >= 0) {
-                mSkillMods[i].setText("+" + temp[i] + " ");
+                mSkillMods[i].setText(String.format("+%d ", temp[i]));
             } else if (temp[i] <= -10) {
                 mSkillMods[i].setText(temp[i]);
             } else {
-                mSkillMods[i].setText("" + temp[i] + " ");
+                mSkillMods[i].setText(String.format("%d ", temp[i]));
             }
         }
         // Proficiency
         int getProf = characterManager.getProficiency();
         if (getProf >= 0) {
-            mProf.setText("+" + getProf);
+            mProf.setText(String.format("+%d", getProf));
         } else {
-            mProf.setText(" " + getProf);
+            mProf.setText(String.format(" %d", getProf));
         }
         // Saving Throws
         temp = characterManager.getSaveProfs();
@@ -364,13 +364,13 @@ public class CharacterSheetFragment extends Fragment implements View.OnClickList
         for (int i = 0; i < temp.length; i++) {
             mTextViewSaveMod[i].setTypeface(Typeface.MONOSPACE);
             if (temp[i] >= 10) {
-                mTextViewSaveMod[i].setText("+" + temp[i]);
+                mTextViewSaveMod[i].setText(String.format("+%d", temp[i]));
             } else if (temp[i] >= 0) {
-                mTextViewSaveMod[i].setText("+" + temp[i] + " ");
+                mTextViewSaveMod[i].setText(String.format("+%d ", temp[i]));
             } else if (temp[i] <= -10) {
                 mTextViewSaveMod[i].setText(temp[i]);
             } else {
-                mTextViewSaveMod[i].setText("" + temp[i] + " ");
+                mTextViewSaveMod[i].setText(String.format("%d ", temp[i]));
             }
         }
         RefreshUI = false;
