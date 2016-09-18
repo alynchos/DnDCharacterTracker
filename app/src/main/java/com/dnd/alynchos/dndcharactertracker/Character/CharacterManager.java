@@ -629,7 +629,8 @@ public class CharacterManager {
         mCharacter.race = retrieve.getString(1);
         mCharacter.class_ = retrieve.getString(2);
         mCharacter.align = retrieve.getString(3);
-        logger.debug("DB Identity: " + mCharacter.name + " " + mCharacter.race + " " + mCharacter.class_ + " " + mCharacter.align);
+        mCharacter.background = retrieve.getString(4);
+        logger.debug("DB Identity: " + mCharacter.name + " " + mCharacter.race + " " + mCharacter.class_ + " " + mCharacter.align + " " + mCharacter.background);
         // Abilities
         columns = new String[6];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_STR;
