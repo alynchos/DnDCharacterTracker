@@ -18,6 +18,7 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/medium_font"
         android:hint="@string/hint_currency"
+        android:minEms="4"
         android:inputType="number"
         android:layout_gravity="center"
         android:paddingStart="@dimen/default_padding"
