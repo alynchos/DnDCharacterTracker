@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
@@ -136,9 +137,7 @@ public class DnDTabBarActivity extends AppCompatActivity
                     //Toast.makeText(dndTabBarActivity, "Inventory Deleted", Toast.LENGTH_SHORT).show();
                 }
             } else if (intent.getAction().equals(CharacterManager.HIDE_KEYBOARD)) {
-                logger.debug("Hiding Keyboard");
-                hideKeyboard();
-                //imm.showSoftInput(mNotes, InputMethodManager.SHOW_IMPLICIT);
+                hideKeyboard(true);
             }
         }
     };
@@ -388,12 +387,12 @@ public class DnDTabBarActivity extends AppCompatActivity
         updateCurrency(String.format("%s", currency[3]), String.format("%s", currency[2]), String.format("%s", currency[1]), String.format("%s", currency[0]));
     }
 
-    private void modifyIdentityDialog(final View v){
+    private void modifyIdentityDialog(final View v) {
         logger.debug("Showing Modify Identity Dialog");
         final CharacterManager characterManager = CharacterManager.getInstance();
         String fillVal = "";
         String title = " ";
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.text_character_alignment:
                 fillVal = characterManager.getAlign();
                 title = getString(R.string.hint_character_alignment);
@@ -423,7 +422,7 @@ public class DnDTabBarActivity extends AppCompatActivity
         DialogInterface.OnClickListener syncNewData = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (v.getId()){
+                switch (v.getId()) {
                     case R.id.text_character_alignment:
                         characterManager.setAlignment(modify_val.getText().toString());
                         break;
@@ -448,8 +447,16 @@ public class DnDTabBarActivity extends AppCompatActivity
                 .setView(dialogView)
                 .setPositiveButton(android.R.string.ok, syncNewData)
                 .setNegativeButton(android.R.string.cancel, null)
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        hideKeyboard(true);
+                    }
+                })
                 .create();
         mModifyIdentityDialog.show();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(getCurrentFocus(), InputMethodManager.SHOW_FORCED);
     }
 
     /* End Private Helper Methods */
@@ -470,8 +477,7 @@ public class DnDTabBarActivity extends AppCompatActivity
         View.OnTouchListener identityModifier = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                logger.debug("Been touched yo: " + event.getAction());
-                switch(event.getAction()){
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         modifyIdentityDialog(v);
                         break;
@@ -638,12 +644,24 @@ public class DnDTabBarActivity extends AppCompatActivity
     }
 
     private void hideKeyboard() {
+        hideKeyboard(false);
+    }
+
+    private void hideKeyboard(boolean force) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (!imm.isAcceptingText() && !force) {
+            return;
+        }
         View view = getCurrentFocus();
-        if (view == null) return;
+        if (view == null) {
+            logger.warn("Current focus was null, cannot hide keyboard");
+            return;
+        }
+        logger.debug("Closing keyboard on view [" + view.getId() + "]");
         ResultReceiver resultReceiver = new ResultReceiver(new Handler()) {
             @Override
             protected void onReceiveResult(int resultCode, Bundle resultData) {
-                logger.debug("Receiver result: " + resultCode);
+                logger.debug("Keyboard closing receiver result: " + resultCode);
                 switch (resultCode) {
                     case InputMethodManager.RESULT_HIDDEN:
                     case InputMethodManager.RESULT_UNCHANGED_HIDDEN:
@@ -651,7 +669,6 @@ public class DnDTabBarActivity extends AppCompatActivity
                 }
             }
         };
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0, resultReceiver);
     }
 

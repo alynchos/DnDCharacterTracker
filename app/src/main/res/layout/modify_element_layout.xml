@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/edit_modify_value"
         android:hint="@string/hint_new_value"
+        android:selectAllOnFocus="true"
         android:inputType="number|numberSigned"/>
 
 </LinearLayout>
