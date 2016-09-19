@@ -3,6 +3,7 @@ package com.dnd.alynchos.dndcharactertracker.Character;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
+import com.dnd.alynchos.dndcharactertracker.DnDTabBarActivity;
 import com.dnd.alynchos.dndcharactertracker.Items.Item;
 import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Weapon;
 import com.dnd.alynchos.dndcharactertracker.R;
@@ -180,7 +183,7 @@ public class CombatFragment extends Fragment {
                 case MotionEvent.ACTION_UP:
                     if(mDoubleClickTimer != null) {
                         mSelectedView = v;
-                        showModifyElementDialog();
+                        showModifyElementDialog(v);
                     }
                     else{
                         mDoubleClickTimer = new CountDownTimer(DOUBLE_TAP_TIME,DOUBLE_TAP_TIME) {
@@ -203,17 +206,47 @@ public class CombatFragment extends Fragment {
     };
 
     /* Element Clicked */
-    private void showModifyElementDialog() {
+    private void showModifyElementDialog(final View v) {
         logger.debug("Showing Element Modify Dialog");
         initModifyElementView();
+        final CharacterManager characterManager = CharacterManager.getInstance();
+        String fillVal = "";
+        String title = " ";
+        switch (v.getId()) {
+            case R.id.include_armor_layout:
+                fillVal = Integer.toString(characterManager.getArmor());
+                title = getString(R.string.text_armor_class);
+                break;
+            case R.id.include_health_layout:
+                fillVal = Integer.toString(characterManager.getHealth());
+                title = getString(R.string.text_current_health_title);
+                break;
+            case R.id.include_initiative_layout:
+                fillVal = Integer.toString(characterManager.getInitiative());
+                title = getString(R.string.text_initiative);
+                break;
+            case R.id.include_speed_layout:
+                fillVal = Integer.toString(characterManager.getSpeed());
+                title = getString(R.string.text_afoot_speed);
+                break;
+        }
         mModifyElementDialog = new AlertDialog.Builder(getActivity())
-                .setTitle("Modify Value")
+                .setTitle("Modify " + title)
                 .setView(mActiveView)
                 .setPositiveButton(android.R.string.ok, modifyElement)
                 .setNegativeButton(android.R.string.cancel, null)
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        getActivity().sendBroadcast(new Intent(CharacterManager.HIDE_KEYBOARD));
+                    }
+                })
                 .create();
+        mModifyElementEdit.setText(fillVal);
         mModifyElementDialog.show();
-        mModifyElementEdit.requestFocus();
+        //mModifyElementEdit.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(getActivity().getCurrentFocus(), InputMethodManager.SHOW_FORCED);
     }
 
     /* Confirm Element Modified */
