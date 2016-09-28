@@ -49,7 +49,6 @@ public class NotesFragment extends Fragment {
         mNotes.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                DnDTabBarActivity.getInstance().onTouchEvent(event);
                 return false;
             }
         });

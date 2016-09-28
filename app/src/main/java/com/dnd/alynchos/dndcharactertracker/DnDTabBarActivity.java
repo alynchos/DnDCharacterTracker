@@ -6,13 +6,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +38,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dnd.alynchos.dndcharactertracker.Character.BaseCharacter;
 import com.dnd.alynchos.dndcharactertracker.Character.CharacterManager;
 import com.dnd.alynchos.dndcharactertracker.Character.CharacterSheetFragment;
 import com.dnd.alynchos.dndcharactertracker.Character.CombatFragment;
@@ -45,9 +51,7 @@ import com.dnd.alynchos.dndcharactertracker.SaveData.FeedReaderDbHelper;
  * Created by Alex Lynchosky on 12/22/2014.
  */
 public class DnDTabBarActivity extends AppCompatActivity
-        implements View.OnClickListener,
-        GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener,
-        CharacterSheetFragment.OnFragmentInteractionListener {
+        implements View.OnClickListener {
 
     /* Debugging */
     private static final String TAG = DnDTabBarActivity.class.getSimpleName();
@@ -59,6 +63,16 @@ public class DnDTabBarActivity extends AppCompatActivity
 
     /* Fragments */
     private final String mCurrentFragmentTag = "FRAG_CURRENT";
+    private final int NUM_TABS = 4;
+    /**
+     * The pager widget, which handles animation and allows swiping horizontally to access previous
+     * and next wizard steps.
+     */
+    private ViewPager mPager;
+    /**
+     * The pager adapter, which provides the pages to the view pager widget.
+     */
+    private PagerAdapter mPagerAdapter;
 
     /* Touch Events */
     private GestureDetectorCompat mDetector;
@@ -157,24 +171,17 @@ public class DnDTabBarActivity extends AppCompatActivity
         setupHamburgerList();
         setupHamburgerMenu();
         setupHamburgerOnClick();
-        switchTab(Tab.character, Direction.down);
+        switchTab(Tab.character);
         mViewConfiguration = ViewConfiguration.get(this);
-        // Instantiate the gesture detector with the
-        // application context and an implementation of
-        // GestureDetector.OnGestureListener
-        mDetector = new GestureDetectorCompat(this, this);
-        // Set the gesture detector as the double tap
-        // listener.
-        mDetector.setOnDoubleTapListener(this);
-        View fragment_body = findViewById(R.id.fragment_body);
-        assert fragment_body != null;
-        fragment_body.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mDetector.onTouchEvent(event);
-                return true;
-            }
-        });
+        // ViewPager
+        mPager = (ViewPager) findViewById(R.id.pager_main_slide_view);
+        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
+        mPager.addOnPageChangeListener(pagerChangeListener);
+        CharacterManager characterManager = CharacterManager.getInstance();
+        if (characterManager.getCharacter() == null) {
+            characterManager.setCharacter(new BaseCharacter());
+        }
     }
 
     @Override
@@ -229,73 +236,8 @@ public class DnDTabBarActivity extends AppCompatActivity
         return super.onTouchEvent(event);
     }
 
-    @Override
-    public boolean onDown(MotionEvent event) {
-        //logger.debug("onDown: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onFling(MotionEvent event1, MotionEvent event2,
-                           float velocityX, float velocityY) {
-        if (velocityX <= (mViewConfiguration.getScaledMinimumFlingVelocity()) * -1) {
-            switchTab(getNextTab(), Direction.left);
-        } else if (velocityX >= mViewConfiguration.getScaledMinimumFlingVelocity()) {
-            switchTab(getNextTab(false), Direction.right);
-        }
-        return true;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent event) {
-        //logger.debug("onLongPress: " + event.toString());
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-                            float distanceY) {
-        //logger.debug("onScroll: " + e1.toString() + e2.toString());
-        return true;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent event) {
-        //logger.debug("onShowPress: " + event.toString());
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent event) {
-        //logger.debug("onSingleTapUp: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTap(MotionEvent event) {
-        //logger.debug("onDoubleTap: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent event) {
-        //logger.debug("onDoubleTapEvent: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent event) {
-        //logger.debug("onSingleTapConfirmed: " + event.toString());
-        return true;
-    }
-
     public static DnDTabBarActivity getInstance() {
         return dndTabBarActivity;
-    }
-
-    /* Fragment Listeners */
-
-    @Override
-    public void onCharacterSheetFragmentInteraction(String string) {
-        Toast.makeText(dndTabBarActivity, ("Fragment communication successful!"), Toast.LENGTH_SHORT).show();
     }
 
     /* End Fragment Listeners */
@@ -550,76 +492,55 @@ public class DnDTabBarActivity extends AppCompatActivity
         mHamburgerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0:
-                        if (mCurrentTab != Tab.character) switchTab(Tab.character, Direction.down);
-                        break;
-                    case 1:
-                        if (mCurrentTab != Tab.combat) switchTab(Tab.combat, Direction.down);
-                        break;
-                    case 2:
-                        if (mCurrentTab != Tab.inventory) switchTab(Tab.inventory, Direction.down);
-                        break;
-                    case 3:
-                        if (mCurrentTab != Tab.notes) switchTab(Tab.notes, Direction.down);
-                        break;
-                    default:
-                        logger.error("Unacceptable tab selected");
-                        break;
-                }
+                logger.debug("Setting page manually to position [" + position + "]");
+                mPager.setCurrentItem(position, false);
                 mHamburgerLayout.closeDrawers();
             }
         });
     }
 
-    private void switchTab(Tab tab, Direction dir) {
-        Fragment fragmentToChange = null;
+    private void switchTab(int tab) {
         switch (tab) {
-            case character:
-                mCurrentTab = Tab.character;
-                mTextViewTitle.setText(getString(R.string.text_character_title));
-                fragmentToChange = new CharacterSheetFragment();
+            case 0:
+                switchTab(Tab.character);
                 break;
-            case combat:
-                mCurrentTab = Tab.combat;
-                mTextViewTitle.setText(getString(R.string.text_combat_title));
-                fragmentToChange = new CombatFragment();
+            case 1:
+                switchTab(Tab.combat);
                 break;
-            case inventory:
-                mCurrentTab = Tab.inventory;
-                mTextViewTitle.setText(getString(R.string.text_inventory_title));
-                fragmentToChange = new InventoryFragment();
+            case 2:
+                switchTab(Tab.inventory);
                 break;
-            case notes:
-                mCurrentTab = Tab.notes;
-                mTextViewTitle.setText(getString(R.string.text_notes_title));
-                fragmentToChange = new NotesFragment();
+            case 3:
+                switchTab(Tab.notes);
                 break;
             default:
                 logger.error("Unacceptable tab selected");
                 break;
         }
-        int intro_anim = 0, outro_anim = 0;
-        switch (dir) {
-            case left:
-                //intro_anim = android.R.anim.slide_out_right;
-                //outro_anim = android.R.anim.fade_out;
+    }
+
+    private void switchTab(Tab tab) {
+        switch (tab) {
+            case character:
+                mCurrentTab = Tab.character;
+                mTextViewTitle.setText(getString(R.string.text_character_title));
                 break;
-            case right:
-                //intro_anim = android.R.anim.slide_in_left;
-                //outro_anim = android.R.anim.fade_out;
+            case combat:
+                mCurrentTab = Tab.combat;
+                mTextViewTitle.setText(getString(R.string.text_combat_title));
                 break;
-            case up:
-            case down:
+            case inventory:
+                mCurrentTab = Tab.inventory;
+                mTextViewTitle.setText(getString(R.string.text_inventory_title));
+                break;
+            case notes:
+                mCurrentTab = Tab.notes;
+                mTextViewTitle.setText(getString(R.string.text_notes_title));
+                break;
             default:
-                intro_anim = android.R.anim.fade_in;
-                outro_anim = android.R.anim.fade_out;
+                logger.error("Unacceptable tab selected");
                 break;
         }
-        getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(intro_anim, outro_anim)
-                .replace(R.id.fragment_body, fragmentToChange, mCurrentFragmentTag)
-                .commit();
     }
 
     private Tab getNextTab() {
@@ -673,4 +594,64 @@ public class DnDTabBarActivity extends AppCompatActivity
     }
 
     /* End Setup Helper Methods */
+
+    /* Screen Slider */
+
+    private ViewPager.OnPageChangeListener pagerChangeListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            switchTab(position);
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
+
+    /**
+     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
+     * sequence.
+     */
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        public ScreenSlidePagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            logger.debug("Getting item [" + position + "]");
+            Fragment fragmentToChange = null;
+            switch (position) {
+                case 0:
+                    fragmentToChange = new CharacterSheetFragment();
+                    break;
+                case 1:
+                    fragmentToChange = new CombatFragment();
+                    break;
+                case 2:
+                    fragmentToChange = new InventoryFragment();
+                    break;
+                case 3:
+                    fragmentToChange = new NotesFragment();
+                    break;
+                default:
+                    logger.error("Unacceptable tab selected");
+                    break;
+            }
+            return fragmentToChange;
+        }
+
+        @Override
+        public int getCount() {
+            return NUM_TABS;
+        }
+    }
+
+    /* End Screen Slider */
 }
