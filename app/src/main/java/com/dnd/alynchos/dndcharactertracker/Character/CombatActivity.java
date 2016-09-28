@@ -105,60 +105,6 @@ public class CombatActivity extends Activity implements View.OnClickListener {
     }
 
     private void updateUI(UpdateUIIds updateID) {
-        CharacterManager characterManager = CharacterManager.getInstance();
-        // Fill in numbers
-        switch(updateID) {
-            case ARMOR:
-                mModifyElementText = (TextView) findViewById(R.id.value_armor);
-                mModifyElementText.setText("" + characterManager.getArmor());
-                break;
-            case HEALTH:
-                mModifyElementText = (TextView) findViewById(R.id.value_health);
-                mModifyElementText.setText("" + characterManager.getHealth());
-                break;
-            case INITIATIVE:
-                mModifyElementText = (TextView) findViewById(R.id.value_initiative);
-                int initiative = characterManager.getInitiative();
-                mModifyElementText.setText("" + (initiative >= 0 ? "+" + initiative : initiative));
-                break;
-            case SPEED:
-                mModifyElementText = (TextView) findViewById(R.id.value_speed);
-                mModifyElementText.setText("" + characterManager.getSpeed());
-                break;
-            case WEAPON_1:
-                // Weapons
-                selectedWeapon = (Weapon) characterManager.getItem(characterManager.getWeaponName(0));
-                if (selectedWeapon != null) {
-                    mModifyElementText = (TextView) findViewById(R.id.text_weapon1_name);
-                    mModifyElementText.setText("" + selectedWeapon.name);
-                    mModifyElementText = (TextView) findViewById(R.id.text_weapon1_atk_bns);
-                    mModifyElementText.setText("+" + characterManager.getAttackBonus(0));
-                    mModifyElementText = (TextView) findViewById(R.id.text_weapon1_damage);
-                    mModifyElementText.setText("" + selectedWeapon.dice_num + "d" + selectedWeapon.dice_size +
-                            " + " + selectedWeapon.flat_damage + " " + selectedWeapon.damage_type);
-                }
-                break;
-            case AMMO:
-                // Ammo
-                selectedAmmo = characterManager.getItem(characterManager.getAmmo());
-                if (selectedAmmo != null) {
-                    mModifyElementText = (TextView) findViewById(R.id.value_ammo);
-                    mModifyElementText.setText("x" + selectedAmmo.amount);
-                    mModifyElementText = (TextView) findViewById(R.id.type_ammo);
-                    mModifyElementText.setText(" " + selectedAmmo.name);
-                }
-                break;
-            case ALL:
-                updateUI(UpdateUIIds.ARMOR);
-                updateUI(UpdateUIIds.HEALTH);
-                updateUI(UpdateUIIds.INITIATIVE);
-                updateUI(UpdateUIIds.SPEED);
-                updateUI(UpdateUIIds.WEAPON_1);
-                updateUI(UpdateUIIds.WEAPON_2);
-                updateUI(UpdateUIIds.WEAPON_3);
-                updateUI(UpdateUIIds.AMMO);
-                break;
-        }
     }
 
     private void showModifyElementDialog() {
@@ -254,7 +200,7 @@ public class CombatActivity extends Activity implements View.OnClickListener {
             try {
                 switch (mPressedButton.getId()) {
                     default:
-                        characterManager.setWeapon(selectedWeapon.name, Integer.parseInt(mModifyElementEdit.getText().toString()), 2);
+                        //characterManager.setWeapon(selectedWeapon.name, Integer.parseInt(mModifyElementEdit.getText().toString()), 2);
                         updateUI(UpdateUIIds.WEAPON_3);
                         break;
                 }

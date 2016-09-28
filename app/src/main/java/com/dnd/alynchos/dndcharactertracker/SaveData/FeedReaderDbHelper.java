@@ -99,13 +99,8 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
                     FeedEntry.COLUMN_INV_DAM_FLAT + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_INV_RANGE + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_INV_DAM_TYPE + TEXT_TYPE + COMMA_SEP +
-                    FeedEntry.COLUMN_INV_WEAPON1 + TEXT_TYPE + COMMA_SEP +
-                    FeedEntry.COLUMN_INV_WEAPON2 + TEXT_TYPE + COMMA_SEP +
-                    FeedEntry.COLUMN_INV_WEAPON3 + TEXT_TYPE + COMMA_SEP +
+                    FeedEntry.COLUMN_INV_WEAPONS + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_INV_AMMO + TEXT_TYPE + COMMA_SEP +
-                    FeedEntry.COLUMN_INV_ATTACK_BNS1 + TEXT_TYPE + COMMA_SEP +
-                    FeedEntry.COLUMN_INV_ATTACK_BNS2 + TEXT_TYPE + COMMA_SEP +
-                    FeedEntry.COLUMN_INV_ATTACK_BNS3 + TEXT_TYPE + COMMA_SEP +
                     FeedEntry.COLUMN_INV_NOTES + TEXT_TYPE +
                     ")";
     private static final String SQL_DELETE_TABLE_CHARACTER =
@@ -413,13 +408,8 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         public static final String COLUMN_INV_DAM_FLAT = "dam_flat";
         public static final String COLUMN_INV_RANGE = "range";
         public static final String COLUMN_INV_DAM_TYPE = "dam_type";
-        public static final String COLUMN_INV_WEAPON1 = "weapon_1";
-        public static final String COLUMN_INV_WEAPON2 = "weapon_2";
-        public static final String COLUMN_INV_WEAPON3 = "weapon_3";
+        public static final String COLUMN_INV_WEAPONS = "weapons";
         public static final String COLUMN_INV_AMMO = "ammo";
-        public static final String COLUMN_INV_ATTACK_BNS1 = "atk_bns_1";
-        public static final String COLUMN_INV_ATTACK_BNS2 = "atk_bns_2";
-        public static final String COLUMN_INV_ATTACK_BNS3 = "atk_bns_3";
         public static final String COLUMN_INV_NOTES = "notes";
     }
 

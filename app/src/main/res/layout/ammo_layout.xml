@@ -8,15 +8,6 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/text_ammo"
-        android:text="@string/text_ammo"
-        android:textStyle="bold"
-        android:textSize="@dimen/large_font"
-        android:paddingStart="@dimen/default_padding"
-        android:paddingEnd="@dimen/default_padding"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/value_ammo"
         android:paddingStart="@dimen/default_padding"
         android:paddingEnd="@dimen/default_padding"

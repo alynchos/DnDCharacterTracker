@@ -157,11 +157,12 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
         if (itemBeingModified instanceof Weapon) {
             logger.debug("item to mod is a weapon");
             Weapon weapon = (Weapon) itemBeingModified;
-            mAddInvDiceNum.setText("" + weapon.dice_num);
-            mAddInvDiceSize.setText("" + weapon.dice_size);
-            mAddInvFlatDam.setText("" + weapon.flat_damage);
-            mAddInvRange.setText("" + weapon.range);
-            mAddInvDamType.setText("" + weapon.damage_type);
+            //TODO: FIX THIS WEAPON LOADING WITH NEW JSON FORMAT
+//            mAddInvDiceNum.setText("" + weapon.dice_num);
+//            mAddInvDiceSize.setText("" + weapon.dice_size);
+//            mAddInvFlatDam.setText("" + weapon.flat_damage);
+//            mAddInvRange.setText("" + weapon.range);
+//            mAddInvDamType.setText("" + weapon.damage_type);
         }
         final Button buttonDeleteItem = (Button) mInventoryAddView.findViewById(R.id.button_delete_item);
         buttonDeleteItem.setOnClickListener(this);
@@ -270,36 +271,37 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
                         weapon.amount = item.amount;
                         weapon.weight = item.weight;
                         weapon.gold_value = item.gold_value;
-                        try {
-                            weapon.dice_num = Integer.parseInt(addInvDiceNum);
-                        } catch (Exception e) {
-                            logger.debug("Could not parse dice num");
-                            weapon.dice_num = 0;
-                        }
-                        try {
-                            weapon.dice_size = Integer.parseInt(addInvDiceSize);
-                        } catch (Exception e) {
-                            logger.debug("Could not parse dice size");
-                            weapon.dice_size = 0;
-                        }
-                        try {
-                            weapon.flat_damage = Integer.parseInt(addInvFlatDamage);
-                        } catch (Exception e) {
-                            logger.debug("Could not parse flat damage");
-                            weapon.flat_damage = 0;
-                        }
-                        try {
-                            weapon.range = Integer.parseInt(addInvRange);
-                        } catch (Exception e) {
-                            logger.debug("Could not parse range");
-                            weapon.range = 0;
-                        }
-                        try {
-                            weapon.damage_type = addInvDamType;
-                        } catch (Exception e) {
-                            logger.debug("Could not parse damage type");
-                            weapon.damage_type = "";
-                        }
+                        //TODO: FIX THIS WEAPON LOADING WITH NEW JSON FORMAT
+//                        try {
+//                            weapon.dice_num = Integer.parseInt(addInvDiceNum);
+//                        } catch (Exception e) {
+//                            logger.debug("Could not parse dice num");
+//                            weapon.dice_num = 0;
+//                        }
+//                        try {
+//                            weapon.dice_size = Integer.parseInt(addInvDiceSize);
+//                        } catch (Exception e) {
+//                            logger.debug("Could not parse dice size");
+//                            weapon.dice_size = 0;
+//                        }
+//                        try {
+//                            weapon.flat_damage = Integer.parseInt(addInvFlatDamage);
+//                        } catch (Exception e) {
+//                            logger.debug("Could not parse flat damage");
+//                            weapon.flat_damage = 0;
+//                        }
+//                        try {
+//                            weapon.range = Integer.parseInt(addInvRange);
+//                        } catch (Exception e) {
+//                            logger.debug("Could not parse range");
+//                            weapon.range = 0;
+//                        }
+//                        try {
+//                            weapon.damage_type = addInvDamType;
+//                        } catch (Exception e) {
+//                            logger.debug("Could not parse damage type");
+//                            weapon.damage_type = "";
+//                        }
                         characterManager.addItemToInventory(weapon);
                     } else {
                         characterManager.addItemToInventory(item);
@@ -345,31 +347,32 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
             }
             if (itemBeingModified instanceof Weapon) {
                 Weapon weapon = new Weapon(newItem);
-                try {
-                    weapon.dice_num = Integer.parseInt(mAddInvDiceNum.getText().toString());
-                } catch (Exception e) {
-                    logger.debug("Could not parse dice_num");
-                    newItem.gold_value = 0;
-                }
-                try {
-                    weapon.dice_size = Integer.parseInt(mAddInvDiceSize.getText().toString());
-                } catch (Exception e) {
-                    logger.debug("Could not parse dice_size");
-                    newItem.gold_value = 0;
-                }
-                try {
-                    weapon.flat_damage = Integer.parseInt(mAddInvFlatDam.getText().toString());
-                } catch (Exception e) {
-                    logger.debug("Could not parse flat_damage");
-                    newItem.gold_value = 0;
-                }
-                try {
-                    weapon.range = Integer.parseInt(mAddInvRange.getText().toString());
-                } catch (Exception e) {
-                    logger.debug("Could not parse range");
-                    newItem.gold_value = 0;
-                }
-                weapon.damage_type = mAddInvDamType.getText().toString();
+                //TODO: FIX THIS WEAPON LOADING WITH NEW JSON FORMAT
+//                try {
+//                    weapon.dice_num = Integer.parseInt(mAddInvDiceNum.getText().toString());
+//                } catch (Exception e) {
+//                    logger.debug("Could not parse dice_num");
+//                    newItem.gold_value = 0;
+//                }
+//                try {
+//                    weapon.dice_size = Integer.parseInt(mAddInvDiceSize.getText().toString());
+//                } catch (Exception e) {
+//                    logger.debug("Could not parse dice_size");
+//                    newItem.gold_value = 0;
+//                }
+//                try {
+//                    weapon.flat_damage = Integer.parseInt(mAddInvFlatDam.getText().toString());
+//                } catch (Exception e) {
+//                    logger.debug("Could not parse flat_damage");
+//                    newItem.gold_value = 0;
+//                }
+//                try {
+//                    weapon.range = Integer.parseInt(mAddInvRange.getText().toString());
+//                } catch (Exception e) {
+//                    logger.debug("Could not parse range");
+//                    newItem.gold_value = 0;
+//                }
+//                weapon.damage_type = mAddInvDamType.getText().toString();
 
                 characterManager.modItem(itemBeingModified.name, weapon);
             } else {

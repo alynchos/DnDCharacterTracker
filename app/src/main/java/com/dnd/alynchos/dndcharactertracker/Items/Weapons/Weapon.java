@@ -2,16 +2,19 @@ package com.dnd.alynchos.dndcharactertracker.Items.Weapons;
 
 import com.dnd.alynchos.dndcharactertracker.Items.Item;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Created by Alex Lynchosky on 12/22/2014.
+ * Base Weapon Class
  */
 public class Weapon extends Item {
-
-    public int dice_num;
-    public int dice_size;
-    public int flat_damage;
+    public int hit;
+    public int hit_bonus;
     public int range;                  /* Measured in feet */
-    public String damage_type;
+    public boolean isProficient;
+    public List<Damage> damages = new LinkedList<>();
 
     public Weapon(){}
 
@@ -23,16 +26,26 @@ public class Weapon extends Item {
         this.gold_value = item.gold_value;
     }
 
-    public String getDamage(){
-        String damage = dice_num + "d" + dice_size + " + " + flat_damage + " " + damage_type;
-        return damage;
-    }
-
     @Override
     public String toString(){
-        return " Weapon: " + name + " " + amount + " " + weight + " " + gold_value+  " " + desc +
-                dice_num + "d" + dice_size + " +" + flat_damage + " " + damage_type + " at " +
-                range + " ft.";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Weapon: ")
+                .append(name)
+                .append(" ")
+                .append(amount)
+                .append(" ")
+                .append(weight)
+                .append(" ")
+                .append(gold_value)
+                .append(" ")
+                .append(desc)
+                .append(" +")
+                .append(hit + hit_bonus)
+                .append(" ");
+        for(Damage dam : damages) {
+            sb.append(dam).append("\n");
+        }
+        return sb.toString();
     }
 
 }

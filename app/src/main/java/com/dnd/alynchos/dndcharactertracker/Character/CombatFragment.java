@@ -60,7 +60,7 @@ public class CombatFragment extends Fragment {
     public static final int DOUBLE_TAP_TIME = 500; // (ms)
 
     private enum UpdateUIIds {
-        ARMOR, HEALTH, INITIATIVE, SPEED, WEAPON_1, WEAPON_2, WEAPON_3, AMMO, ALL
+        ARMOR, HEALTH, INITIATIVE, SPEED, WEAPON, AMMO, ALL
     }
 
     public CombatFragment() {
@@ -137,7 +137,7 @@ public class CombatFragment extends Fragment {
             case SPEED:
                 mModifySpeedText.setText("" + characterManager.getSpeed());
                 break;
-            case WEAPON_1:
+            case WEAPON:
                 // Weapons
                 selectedWeapon = (Weapon) characterManager.getItem(characterManager.getWeaponName(0));
                 if (selectedWeapon != null) {
@@ -165,9 +165,7 @@ public class CombatFragment extends Fragment {
                 updateUI(UpdateUIIds.HEALTH);
                 updateUI(UpdateUIIds.INITIATIVE);
                 updateUI(UpdateUIIds.SPEED);
-                updateUI(UpdateUIIds.WEAPON_1);
-                updateUI(UpdateUIIds.WEAPON_2);
-                updateUI(UpdateUIIds.WEAPON_3);
+                updateUI(UpdateUIIds.WEAPON);
                 updateUI(UpdateUIIds.AMMO);
                 break;
         }

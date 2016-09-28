@@ -15,6 +15,7 @@ import java.util.LinkedList;
 
 /**
  * Created by Alex Lynchosky on 12/22/2014.
+ * The main character manager. Handles saving and retrieving data.
  */
 public class CharacterManager {
 
@@ -29,14 +30,6 @@ public class CharacterManager {
     public static final String CLEAR_INV = "com.dnd.alynchos.CLEAR_INV";
     public static final String HIDE_KEYBOARD = "com.dnd.alynchos.HIDE_KEYBOARD";
     public static final String SHOW_KEYBOARD = "com.dnd.alynchos.HIDE_KEYBOARD";
-
-    // Intent Extras
-    public static final String KEYBOARD_VIEW = "viewToHideFrom";
-
-    // Constants
-    public static final int ACR = 0, ANI = 1, ARC = 2, ATH = 3, DEC = 4, HIS = 5, INS = 6,
-            INTI = 7, INV = 8, MED = 9, NAT = 10, PER = 11, PERF = 12, PERS = 13,
-            REL = 14, SLE = 15, STE = 16, SUR = 17;
 
     public enum CurrencyType {
         copper,
@@ -85,10 +78,6 @@ public class CharacterManager {
         mCharacter.chr = abilities[5];
     }
 
-    public void setAmmo(String name) {
-        mCharacter.ammo = name;
-    }
-
     public void setArmor(int armor) {
         mCharacter.armor = armor;
     }
@@ -129,7 +118,9 @@ public class CharacterManager {
         mCharacter.initiative = initiative;
     }
 
-    public void setNotes(String set){mCharacter.notes = set;}
+    public void setNotes(String set) {
+        mCharacter.notes = set;
+    }
 
     public void setProficiency(int proficiency) {
         mCharacter.proficiency = proficiency;
@@ -140,9 +131,7 @@ public class CharacterManager {
             logger.debug("Incorrect saving throws array length: " + savingThrows.length);
             return;
         }
-        for (int i = 0; i < savingThrows.length; i++) {
-            mCharacter.saveProf[i] = savingThrows[i];
-        }
+        System.arraycopy(savingThrows, 0, mCharacter.saveProf, 0, savingThrows.length);
     }
 
     public void setSkillProf(BaseCharacter.Skill skill, int val) {
@@ -157,11 +146,6 @@ public class CharacterManager {
         mCharacter.speed = speed;
     }
 
-    public void setWeapon(String name, int atk_bns, int num) {
-        mCharacter.attack_bonus[num] = atk_bns;
-        mCharacter.weapons[num] = name;
-    }
-
     /**
      * *************************************************************
      * ***************** Public Getter Functions *********************
@@ -174,11 +158,7 @@ public class CharacterManager {
     }
 
     public String getAmmo() {
-        return mCharacter.ammo;
-    }
-
-    public int getAttackBonus(int num) {
-        return mCharacter.attack_bonus[num];
+        return " ";
     }
 
     public int getHealth() {
@@ -194,7 +174,11 @@ public class CharacterManager {
     }
 
     public String getWeaponName(int num) {
-        return mCharacter.weapons[num];
+        if (num > mCharacter.weapons.size()) {
+            logger.error("Invalid index for weapons: " + num);
+            return null;
+        }
+        return mCharacter.weapons.get(num);
     }
 
     public BaseCharacter getCharacter() {
@@ -203,32 +187,32 @@ public class CharacterManager {
 
     // Identity
     public String getName() {
-        if(mCharacter.name == null) mCharacter.name = " ";
+        if (mCharacter.name == null) mCharacter.name = " ";
         return mCharacter.name;
     }
 
     public String getRace() {
-        if(mCharacter.race == null) mCharacter.race = " ";
+        if (mCharacter.race == null) mCharacter.race = " ";
         return mCharacter.race;
     }
 
     public String getClass_() {
-        if(mCharacter.class_ == null) mCharacter.class_ = " ";
+        if (mCharacter.class_ == null) mCharacter.class_ = " ";
         return mCharacter.class_;
     }
 
     public String getAlign() {
-        if(mCharacter.align == null) mCharacter.align = " ";
+        if (mCharacter.align == null) mCharacter.align = " ";
         return mCharacter.align;
     }
 
     public String getBackground() {
-        if(mCharacter.background == null) mCharacter.background = " ";
+        if (mCharacter.background == null) mCharacter.background = " ";
         return mCharacter.background;
     }
 
-    public String getNotes(){
-        if(mCharacter.notes == null) mCharacter.notes = " ";
+    public String getNotes() {
+        if (mCharacter.notes == null) mCharacter.notes = " ";
         return mCharacter.notes;
     }
 
@@ -360,32 +344,33 @@ public class CharacterManager {
                 columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_NAME;
                 data[0] = item.name;
                 columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_AMOUNT;
-                data[1] = new Integer(item.amount);
+                data[1] = item.amount;
                 columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_GOLD;
-                data[2] = new Double(item.gold_value);
+                data[2] = item.gold_value;
                 columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEIGHT;
-                data[3] = new Double(item.weight);
+                data[3] = item.weight;
                 columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DESC;
                 data[4] = item.desc;
                 if (array_size > 5) {
-                    columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DICE_NUM;
-                    data[5] = new Integer(weapon.dice_num);
-                    columns[6] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DICE_SIZE;
-                    data[6] = new Integer(weapon.dice_size);
-                    columns[7] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DAM_FLAT;
-                    data[7] = new Integer(weapon.flat_damage);
-                    columns[8] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_RANGE;
-                    data[8] = new Integer(weapon.range);
-                    columns[9] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DAM_TYPE;
-                    data[9] = weapon.damage_type;
+                    //TODO: FIX THIS WEAPON LOADING WITH NEW JSON FORMAT
+//                    columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DICE_NUM;
+//                    data[5] = weapon.dice_num;
+//                    columns[6] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DICE_SIZE;
+//                    data[6] = weapon.dice_size;
+//                    columns[7] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DAM_FLAT;
+//                    data[7] = weapon.flat_damage;
+//                    columns[8] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_RANGE;
+//                    data[8] = weapon.range;
+//                    columns[9] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DAM_TYPE;
+//                    data[9] = weapon.damage_type;
                 }
+                assert feedReaderDbHelper != null;
                 feedReaderDbHelper.insertData(table, columns, data);
                 return 1;
             }
 
             @Override
             protected void onPostExecute(Integer count) {
-                return;
             }
         });
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -439,9 +424,7 @@ public class CharacterManager {
     public String[] getInventoryItemNames() {
         String names[] = new String[mCharacter.inventory.size()];
         String set[] = mCharacter.inventory.keySet().toArray(new String[names.length]);
-        for (int i = 0; i < names.length; i++) {
-            names[i] = set[i];
-        }
+        System.arraycopy(set, 0, names, 0, names.length);
         return names;
     }
 
@@ -451,30 +434,24 @@ public class CharacterManager {
         LinkedList<Item> items = new LinkedList<>();
         Item list[] = mCharacter.inventory.values().toArray(new Item[mCharacter.inventory.size()]);
         // Find the weapons
-        for (int i = 0; i < list.length; i++) {
-            if(list[i] instanceof Weapon){
+        for (Item aList : list) {
+            if (aList instanceof Weapon) {
                 if (wantWeapons) {
-                    weapons.add((Weapon)list[i]);
-                } else {
-                    continue;
+                    weapons.add((Weapon) aList);
                 }
-            }
-            else{
-                if (wantWeapons) {
-                    continue;
-                } else {
-                    items.add(list[i]);
+            } else {
+                if (!wantWeapons) {
+                    items.add(aList);
                 }
             }
         }
         String names[];
-        if(wantWeapons){
+        if (wantWeapons) {
             names = new String[weapons.size()];
             for (int i = 0; i < names.length; i++) {
                 names[i] = weapons.get(i).name;
             }
-        }
-        else{
+        } else {
             names = new String[items.size()];
             for (int i = 0; i < names.length; i++) {
                 names[i] = items.get(i).name;
@@ -505,6 +482,7 @@ public class CharacterManager {
             @Override
             protected Integer doInBackground(Void... voids) {
                 FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
+                assert feedReaderDbHelper != null;
                 feedReaderDbHelper.deleteItemData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, name);
                 return 1;
             }
@@ -531,30 +509,32 @@ public class CharacterManager {
                 Object data[] = new Object[array_length];
                 String columns[] = new String[array_length];
                 columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEIGHT;
-                data[0] = new Double(item.weight);
+                data[0] = item.weight;
                 columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_GOLD;
-                data[1] = new Double(item.gold_value);
+                data[1] = item.gold_value;
                 columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DESC;
                 data[2] = item.desc;
                 columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_NAME;
                 data[3] = item.name;
                 columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_AMOUNT;
-                data[4] = new Integer(item.amount);
+                data[4] = item.amount;
                 if (array_length > 5) {
                     Weapon weapon = (Weapon) item;
-                    columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DICE_NUM;
-                    data[5] = new Integer(weapon.dice_num);
-                    columns[6] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DICE_SIZE;
-                    data[6] = new Integer(weapon.dice_size);
-                    columns[7] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DAM_FLAT;
-                    data[7] = new Integer(weapon.flat_damage);
-                    columns[8] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_RANGE;
-                    data[8] = new Integer(weapon.range);
-                    columns[9] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DAM_TYPE;
-                    data[9] = weapon.damage_type;
+                    //TODO: FIX THIS WEAPON LOADING WITH NEW JSON FORMAT
+//                    columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DICE_NUM;
+//                    data[5] = weapon.dice_num;
+//                    columns[6] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DICE_SIZE;
+//                    data[6] = weapon.dice_size;
+//                    columns[7] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DAM_FLAT;
+//                    data[7] = weapon.flat_damage;
+//                    columns[8] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_RANGE;
+//                    data[8] = weapon.range;
+//                    columns[9] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DAM_TYPE;
+//                    data[9] = weapon.damage_type;
                 }
                 String whereColumns[] = new String[]{FeedReaderDbHelper.FeedEntry.COLUMN_INV_NAME};
                 Object whereArgs[] = new Object[]{name};
+                assert feedReaderDbHelper != null;
                 feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, columns, data, whereColumns, whereArgs);
                 return 1;
             }
@@ -724,32 +704,19 @@ public class CharacterManager {
         mCharacter.armor = retrieve.getInt(1);
         mCharacter.initiative = retrieve.getInt(2);
         mCharacter.speed = retrieve.getInt(3);
-        columns = new String[7];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_ATTACK_BNS1;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_ATTACK_BNS2;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_ATTACK_BNS3;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPON1;
-        columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPON2;
-        columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPON3;
-        columns[6] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_AMMO;
+        columns = new String[2];
+        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPONS;
+        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_AMMO;
         retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, columns);
         retrieve.moveToFirst();
         try {
-            for (int i = 0; i < 3; i++) {
-                mCharacter.attack_bonus[i] = retrieve.getInt(i);
-            }
-            for (int i = 3; i < 6; i++) {
-                mCharacter.weapons[i - 3] = retrieve.getString(i);
-            }
-            mCharacter.ammo = retrieve.getString(6);
+            //TODO: RETRIEVE WEAPONS AND AMMO
         } catch (Exception e) {
             logger.error("There are no items in inventory yet!");
         }
+        //TODO: PRINT THIS SHIT OUT CORRECTLY
         logger.debug("DB Health: " + mCharacter.health + " Armor: " + mCharacter.armor + " Ini: " +
-                mCharacter.initiative + " Speed: " + mCharacter.speed + " AtkBns: +" + mCharacter.attack_bonus[0] +
-                " +" + mCharacter.attack_bonus[1] + " +" + mCharacter.attack_bonus[2] + " Weapons: " +
-                mCharacter.weapons[0] + " " + mCharacter.weapons[1] + mCharacter.weapons[2] + " Ammo: " +
-                mCharacter.ammo);
+                mCharacter.initiative + " Speed: " + mCharacter.speed);
         // Currency
         columns = new String[4];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_COPPER;
@@ -762,7 +729,7 @@ public class CharacterManager {
         mCharacter.silver = retrieve.getInt(1);
         mCharacter.gold = retrieve.getInt(2);
         mCharacter.plat = retrieve.getInt(3);
-        logger.debug("DB Currency: [" + mCharacter.copper + ", " + mCharacter.silver + ", " +mCharacter.gold + ", " +mCharacter.plat + "]");
+        logger.debug("DB Currency: [" + mCharacter.copper + ", " + mCharacter.silver + ", " + mCharacter.gold + ", " + mCharacter.plat + "]");
         // Notes
         columns = new String[1];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_NOTES;
@@ -771,8 +738,7 @@ public class CharacterManager {
         try {
             mCharacter.notes = retrieve.getString(0);
             logger.debug("DB Notes: " + mCharacter.notes);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             logger.error("There are no notes yet!");
         }
     }
@@ -782,8 +748,9 @@ public class CharacterManager {
         FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
         Cursor retrieve;
         String columns[] = new String[]{"*"};
+        assert feedReaderDbHelper != null;
         retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, columns);
-        LinkedList<Item> item_list = new LinkedList<Item>();
+        LinkedList<Item> item_list = new LinkedList<>();
         while (retrieve.moveToNext()) {
             Item curr = new Item();
             try {
@@ -816,49 +783,47 @@ public class CharacterManager {
                 logger.debug("Failed retrieving amount");
                 curr.amount = 0;
             }
-            boolean isWeapon = false;
+            boolean isWeapon;
             Weapon weapon = new Weapon(curr);
-            try {
-                weapon.dice_num = retrieve.getInt(6);
-                isWeapon = true;
-                if (weapon.dice_num == 0) {
-                    isWeapon = false;
-                }
-            } catch (Exception e) {
-                logger.debug("Failed retrieving dice_num");
-                isWeapon = false;
-            }
-            if (isWeapon) {
-                try {
-                    weapon.dice_size = retrieve.getInt(7);
-                } catch (Exception e) {
-                    logger.debug("Failed retrieving dice_size");
-                    weapon.dice_size = 0;
-                }
-                try {
-                    weapon.flat_damage = retrieve.getInt(8);
-                } catch (Exception e) {
-                    logger.debug("Failed retrieving flat damage");
-                    weapon.flat_damage = 0;
-                }
-                try {
-                    weapon.range = retrieve.getInt(9);
-                } catch (Exception e) {
-                    logger.debug("Failed retrieving range");
-                    weapon.range = 0;
-                }
-                try {
-                    weapon.damage_type = retrieve.getString(10);
-                } catch (Exception e) {
-                    logger.debug("Failed retrieving damage type");
-                    weapon.damage_type = " ";
-                }
-                logger.debug(weapon.toString());
-                item_list.add(weapon);
-            } else {
-                logger.debug(curr.toString());
-                item_list.add(curr);
-            }
+            //TODO: FIX THIS WEAPON LOADING WITH NEW JSON FORMAT
+//            try {
+//                weapon.dice_num = retrieve.getInt(6);
+//                isWeapon = weapon.dice_num != 0;
+//            } catch (Exception e) {
+//                logger.debug("Failed retrieving dice_num");
+//                isWeapon = false;
+//            }
+//            if (isWeapon) {
+//                try {
+//                    weapon.dice_size = retrieve.getInt(7);
+//                } catch (Exception e) {
+//                    logger.debug("Failed retrieving dice_size");
+//                    weapon.dice_size = 0;
+//                }
+//                try {
+//                    weapon.flat_damage = retrieve.getInt(8);
+//                } catch (Exception e) {
+//                    logger.debug("Failed retrieving flat damage");
+//                    weapon.flat_damage = 0;
+//                }
+//                try {
+//                    weapon.range = retrieve.getInt(9);
+//                } catch (Exception e) {
+//                    logger.debug("Failed retrieving range");
+//                    weapon.range = 0;
+//                }
+//                try {
+//                    weapon.damage_type = retrieve.getString(10);
+//                } catch (Exception e) {
+//                    logger.debug("Failed retrieving damage type");
+//                    weapon.damage_type = " ";
+//                }
+//                logger.debug(weapon.toString());
+//                item_list.add(weapon);
+//            } else {
+//                logger.debug(curr.toString());
+//                item_list.add(curr);
+//            }
         }
         for (int i = 0; i < item_list.size(); i++) {
             mCharacter.inventory.put(item_list.get(i).name, item_list.get(i));
@@ -868,12 +833,12 @@ public class CharacterManager {
     private void saveAbilities() {
         FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
         Object save[] = new Object[6];
-        save[0] = new Integer(mCharacter.str);
-        save[1] = new Integer(mCharacter.dex);
-        save[2] = new Integer(mCharacter.con);
-        save[3] = new Integer(mCharacter.intel);
-        save[4] = new Integer(mCharacter.wis);
-        save[5] = new Integer(mCharacter.chr);
+        save[0] = mCharacter.str;
+        save[1] = mCharacter.dex;
+        save[2] = mCharacter.con;
+        save[3] = mCharacter.intel;
+        save[4] = mCharacter.wis;
+        save[5] = mCharacter.chr;
         String columns[] = new String[6];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_STR;
         columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_DEX;
@@ -888,10 +853,10 @@ public class CharacterManager {
     private void saveCombat() {
         FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
         Object save[] = new Object[4];
-        save[0] = new Integer(mCharacter.health);
-        save[1] = new Integer(mCharacter.armor);
-        save[2] = new Integer(mCharacter.initiative);
-        save[3] = new Integer(mCharacter.speed);
+        save[0] = mCharacter.health;
+        save[1] = mCharacter.armor;
+        save[2] = mCharacter.initiative;
+        save[3] = mCharacter.speed;
         String columns[] = new String[4];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_HEALTH;
         columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_ARMOR;
@@ -899,21 +864,21 @@ public class CharacterManager {
         columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_SPEED;
         assert feedReaderDbHelper != null;
         feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
-        save = new Object[7];
-        for (int i = 0; i < 3; i++) {
-            save[i] = new Integer(mCharacter.attack_bonus[i]);
-        }
-        save[3] = mCharacter.weapons[0];
-        save[4] = mCharacter.weapons[1];
-        save[5] = mCharacter.weapons[2];
-        save[6] = mCharacter.ammo;
+        save = new Object[2];
+        //TODO: CREATE SAVING FORMAT
+        // Save weapons format JSON:
+        // {
+        // "name":"String"
+        // "prof":"boolean"
+        // "hit_bns":"int"
+        // "dmg_bns":"int"
+        // "dmg_base":"int"
+        // "desc":"String"
+        // }
+        save[0] = mCharacter.weapons;
+        save[1] = mCharacter.ammo;
         columns = new String[7];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_ATTACK_BNS1;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_ATTACK_BNS2;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_ATTACK_BNS3;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPON1;
-        columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPON2;
-        columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPON3;
+        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPONS;
         columns[6] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_AMMO;
         feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, columns, save);
     }
@@ -965,23 +930,24 @@ public class CharacterManager {
     private void saveNotes() {
         FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
         Object save[] = new Object[1];
-        if(mCharacter.notes == null){
-            save[0] = new String(" ");
-        }
-        else{
+        if (mCharacter.notes == null) {
+            save[0] = " ";
+        } else {
             save[0] = mCharacter.notes;
         }
         String columns[] = new String[1];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_NOTES;
+        assert feedReaderDbHelper != null;
         feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, columns, save);
     }
 
     private void saveProficiency() {
         FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
         Object save[] = new Object[1];
-        save[0] = new Integer(mCharacter.proficiency);
+        save[0] = mCharacter.proficiency;
         String columns[] = new String[1];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_PROFICIENCY;
+        assert feedReaderDbHelper != null;
         feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
     }
 
@@ -989,7 +955,7 @@ public class CharacterManager {
         FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
         Object save[] = new Object[6];
         for (int i = 0; i < save.length; i++) {
-            save[i] = new Integer(mCharacter.saveProf[i]);
+            save[i] = mCharacter.saveProf[i];
         }
         String columns[] = new String[6];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_STR;
@@ -998,6 +964,7 @@ public class CharacterManager {
         columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_INT;
         columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_WIS;
         columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_CHR;
+        assert feedReaderDbHelper != null;
         feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
     }
 
@@ -1005,7 +972,7 @@ public class CharacterManager {
         FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
         Object save[] = new Object[18];
         for (int i = 0; i < save.length; i++) {
-            save[i] = new Integer(mCharacter.skillProf[i]);
+            save[i] = mCharacter.skillProf[i];
         }
         String columns[] = new String[18];
         columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_ACR;
@@ -1026,6 +993,7 @@ public class CharacterManager {
         columns[15] = FeedReaderDbHelper.FeedEntry.COLUMN_SLE;
         columns[16] = FeedReaderDbHelper.FeedEntry.COLUMN_STE;
         columns[17] = FeedReaderDbHelper.FeedEntry.COLUMN_SUR;
+        assert feedReaderDbHelper != null;
         feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
     }
 
