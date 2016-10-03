@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -42,6 +43,7 @@ public class CombatFragment extends Fragment {
     private TextView mModifyHealthText;
     private TextView mModifyInitiativeText;
     private TextView mModifySpeedText;
+    private FloatingActionButton mAddFab;
 
     /* Modify Attr elements */
     private AlertDialog mModifyElementDialog;
@@ -59,7 +61,7 @@ public class CombatFragment extends Fragment {
     CountDownTimer mDoubleClickTimer = null;
     public static final int DOUBLE_TAP_TIME = 500; // (ms)
 
-    private enum UpdateUIIds {
+    public enum UpdateUIIds {
         ARMOR, HEALTH, INITIATIVE, SPEED, WEAPON, AMMO, ALL
     }
 
@@ -81,6 +83,11 @@ public class CombatFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
     }
@@ -91,8 +98,7 @@ public class CombatFragment extends Fragment {
     }
 
     /* Init Methods */
-
-    private void initUI(View view){
+    private void initUI(View view) {
         View currView = view.findViewById(R.id.include_armor_layout);
         currView.setOnTouchListener(viewTouched);
         mModifyArmorText = (TextView) currView.findViewById(R.id.value_armor);
@@ -108,6 +114,9 @@ public class CombatFragment extends Fragment {
         currView = view.findViewById(R.id.include_speed_layout);
         currView.setOnTouchListener(viewTouched);
         mModifySpeedText = (TextView) currView.findViewById(R.id.value_speed);
+
+        mAddFab = (FloatingActionButton) view.findViewById(R.id.fab_add_to_combat);
+        mAddFab.setOnClickListener(fabClick);
     }
 
     private void initModifyElementView() {
@@ -119,11 +128,10 @@ public class CombatFragment extends Fragment {
     /* End Init Methods */
 
     /* Update Methods */
-
-    private void updateUI(UpdateUIIds updateID) {
+    public void updateUI(UpdateUIIds updateID) {
         CharacterManager characterManager = CharacterManager.getInstance();
         // Fill in numbers
-        switch(updateID) {
+        switch (updateID) {
             case ARMOR:
                 mModifyArmorText.setText("" + characterManager.getArmor());
                 break;
@@ -141,26 +149,16 @@ public class CombatFragment extends Fragment {
                 // Weapons
                 selectedWeapon = (Weapon) characterManager.getItem(characterManager.getWeaponName(0));
                 if (selectedWeapon != null) {
-//                    mModifyElementText = (TextView) findViewById(R.id.text_weapon1_name);
-//                    mModifyElementText.setText("" + selectedWeapon.name);
-//                    mModifyElementText = (TextView) findViewById(R.id.text_weapon1_atk_bns);
-//                    mModifyElementText.setText("+" + characterManager.getAttackBonus(0));
-//                    mModifyElementText = (TextView) findViewById(R.id.text_weapon1_damage);
-//                    mModifyElementText.setText("" + selectedWeapon.dice_num + "d" + selectedWeapon.dice_size +
-//                            " + " + selectedWeapon.flat_damage + " " + selectedWeapon.damage_type);
                 }
                 break;
             case AMMO:
                 // Ammo
                 selectedAmmo = characterManager.getItem(characterManager.getAmmo());
                 if (selectedAmmo != null) {
-//                    mModifyElementText = (TextView) findViewById(R.id.value_ammo);
-//                    mModifyElementText.setText("x" + selectedAmmo.amount);
-//                    mModifyElementText = (TextView) findViewById(R.id.type_ammo);
-//                    mModifyElementText.setText(" " + selectedAmmo.name);
                 }
                 break;
             case ALL:
+                logger.debug("Updating combat UI");
                 updateUI(UpdateUIIds.ARMOR);
                 updateUI(UpdateUIIds.HEALTH);
                 updateUI(UpdateUIIds.INITIATIVE);
@@ -173,18 +171,25 @@ public class CombatFragment extends Fragment {
 
     /* End Update Methods */
 
-    /* OnTouch Listener */
+    /* Add new combat item listener */
+    View.OnClickListener fabClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            
+        }
+    };
+
+    /* Double click modify listener */
     View.OnTouchListener viewTouched = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            switch(event.getAction()) {
+            switch (event.getAction()) {
                 case MotionEvent.ACTION_UP:
-                    if(mDoubleClickTimer != null) {
+                    if (mDoubleClickTimer != null) {
                         mSelectedView = v;
                         showModifyElementDialog(v);
-                    }
-                    else{
-                        mDoubleClickTimer = new CountDownTimer(DOUBLE_TAP_TIME,DOUBLE_TAP_TIME) {
+                    } else {
+                        mDoubleClickTimer = new CountDownTimer(DOUBLE_TAP_TIME, DOUBLE_TAP_TIME) {
                             @Override
                             public void onTick(long millisUntilFinished) {
 

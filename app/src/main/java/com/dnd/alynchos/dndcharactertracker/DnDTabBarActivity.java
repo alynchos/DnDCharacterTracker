@@ -6,14 +6,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.DataSetObserver;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
@@ -22,7 +21,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -49,6 +47,7 @@ import com.dnd.alynchos.dndcharactertracker.SaveData.FeedReaderDbHelper;
 
 /**
  * Created by Alex Lynchosky on 12/22/2014.
+ * Parent activity for the application
  */
 public class DnDTabBarActivity extends AppCompatActivity
         implements View.OnClickListener {
@@ -64,6 +63,11 @@ public class DnDTabBarActivity extends AppCompatActivity
     /* Fragments */
     private final String mCurrentFragmentTag = "FRAG_CURRENT";
     private final int NUM_TABS = 4;
+    private CharacterSheetFragment mCharacterSheetFragment;
+    private CombatFragment mCombatFragment;
+    private InventoryFragment mInventoryFragment;
+    private NotesFragment mNotesFragment;
+
     /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
      * and next wizard steps.
@@ -73,9 +77,6 @@ public class DnDTabBarActivity extends AppCompatActivity
      * The pager adapter, which provides the pages to the view pager widget.
      */
     private PagerAdapter mPagerAdapter;
-
-    /* Touch Events */
-    private GestureDetectorCompat mDetector;
 
     /* Hamburger Menu */
     private ListView mHamburgerList;
@@ -109,14 +110,6 @@ public class DnDTabBarActivity extends AppCompatActivity
         notes
     }
 
-    private enum Direction {
-        left,
-        right,
-        up,
-        down
-    }
-
-
     /* Broadcast Receivers */
     boolean updateUIRegistered = false;
 
@@ -129,11 +122,21 @@ public class DnDTabBarActivity extends AppCompatActivity
             if (intent.getAction().equals(CharacterManager.UPDATE_UI)) {
                 logger.debug("Update UI from broadcast");
                 updateHamburgerMenuInfo();
-                Fragment frag = getSupportFragmentManager().findFragmentByTag(mCurrentFragmentTag);
-                if (frag instanceof CharacterSheetFragment) {
-                    ((CharacterSheetFragment) frag).updateUI();
-                    Toast.makeText(dndTabBarActivity, "Data Loaded", Toast.LENGTH_SHORT).show();
+                switch (mCurrentTab) {
+                    case character:
+                        mCharacterSheetFragment.updateUI();
+                        break;
+                    case combat:
+                        mCombatFragment.updateUI(CombatFragment.UpdateUIIds.ALL);
+                        break;
+                    case inventory:
+                        mInventoryFragment.updateHeader();
+                        mInventoryFragment.updateInventoryList();
+                        break;
+                    case notes:
+                        break;
                 }
+                //Toast.makeText(dndTabBarActivity, "Data Loaded", Toast.LENGTH_SHORT).show();
             } else if (intent.getAction().equals(CharacterManager.UPDATE_INV_UI)) {
                 logger.debug("Update Inventory UI from broadcast");
                 Fragment frag = getSupportFragmentManager().findFragmentByTag(mCurrentFragmentTag);
@@ -227,13 +230,6 @@ public class DnDTabBarActivity extends AppCompatActivity
                 currencyOnClick(v);
                 break;
         }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        this.mDetector.onTouchEvent(event);
-        // Be sure to call the superclass implementation
-        return super.onTouchEvent(event);
     }
 
     public static DnDTabBarActivity getInstance() {
@@ -541,27 +537,7 @@ public class DnDTabBarActivity extends AppCompatActivity
                 logger.error("Unacceptable tab selected");
                 break;
         }
-    }
-
-    private Tab getNextTab() {
-        return getNextTab(true);
-    }
-
-    private Tab getNextTab(boolean forward) {
-        if (mCurrentTab == null) return Tab.character;
-        switch (mCurrentTab) {
-            case character:
-                return forward ? Tab.combat : Tab.notes;
-            case combat:
-                return forward ? Tab.inventory : Tab.character;
-            case inventory:
-                return forward ? Tab.notes : Tab.combat;
-            case notes:
-                return forward ? Tab.character : Tab.inventory;
-            default:
-                logger.error("Unacceptable tab selected");
-                return Tab.character;
-        }
+        sendBroadcast(new Intent(CharacterManager.UPDATE_UI));
     }
 
     private void hideKeyboard() {
@@ -614,10 +590,6 @@ public class DnDTabBarActivity extends AppCompatActivity
         }
     };
 
-    /**
-     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
-     * sequence.
-     */
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
@@ -630,18 +602,22 @@ public class DnDTabBarActivity extends AppCompatActivity
             switch (position) {
                 case 0:
                     fragmentToChange = new CharacterSheetFragment();
+                    mCharacterSheetFragment = (CharacterSheetFragment)fragmentToChange;
                     break;
                 case 1:
                     fragmentToChange = new CombatFragment();
+                    mCombatFragment = (CombatFragment)fragmentToChange;
                     break;
                 case 2:
                     fragmentToChange = new InventoryFragment();
+                    mInventoryFragment = (InventoryFragment)fragmentToChange;
                     break;
                 case 3:
                     fragmentToChange = new NotesFragment();
+                    mNotesFragment = (NotesFragment)fragmentToChange;
                     break;
                 default:
-                    logger.error("Unacceptable tab selected");
+                    logger.error("Unacceptable tab");
                     break;
             }
             return fragmentToChange;
