@@ -40,7 +40,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
             "DROP TABLE IF EXISTS " + FeedEntry.TABLE_CHARACTER;
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "FeedReader.db";
 
 
@@ -98,12 +98,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         return db.insert(table, null, values);
     }
 
-    // Right now this retrieves an entire column to make it easy on me
-    public Cursor queryData(String table, String columns[]) {
-        return queryData(table, columns, null, null);
-    }
-
-    // Right now this retrieves an entire column to make it easy on me
+    // Retrieve data from the desired table
     public Cursor queryData(String table, String columns[], String selection, String[] selectionArgs) {
         SQLiteDatabase db = getReadableDatabase();
 
@@ -118,10 +113,6 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         );
         cursor.moveToFirst();
         return cursor;
-    }
-
-    public void updateData(String table, String columns[], Object data[]) {
-        updateData(table, columns, data, null, null);
     }
 
     public void updateData(String table, String columns[], Object data[], String whereColumns[], Object whereArgs[]) {

@@ -188,7 +188,7 @@ public class CharacterManager {
     }
 
     public String getWeaponName(int num) {
-        if (num > mCharacter.weapons.size()) {
+        if (num >= mCharacter.weapons.size()) {
             logger.error("Invalid index for weapons: " + num);
             return null;
         }
@@ -550,8 +550,7 @@ public class CharacterManager {
                     (FeedReaderDbHelper.FeedEntry._ID + " = ?"),
                     new String[]{"" + character_uuid});
             queryData.moveToFirst();
-            logger.debug(queryData.getString(0));
-            logger.debug("Character found, updating data.");
+            logger.debug("Previous instance found, overwriting character[" + character_uuid + "]: " + queryData.getString(0));
             feedReaderDbHelper.updateData(
                     FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER,
                     new String[]{FeedReaderDbHelper.FeedEntry.COLUMN_CHARACTER},
@@ -560,7 +559,7 @@ public class CharacterManager {
                     where_args);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.debug("The character does not exist yet, creating new entry.");
+            logger.debug("Character[" + character_uuid + "] does not exist, creating new entry.");
             return feedReaderDbHelper.addRow(
                     FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER,
                     new String[]{FeedReaderDbHelper.FeedEntry.COLUMN_CHARACTER},
@@ -589,7 +588,7 @@ public class CharacterManager {
         }
         catch (Exception e) {
             e.printStackTrace();
-            logger.error("Unable to retrieve character from database!");
+            logger.error("Unable to retrieve character[" + character_uuid + "] from database!");
         }
         return mCurrentCharacterUUID;
     }

@@ -1,11 +1,9 @@
 package com.dnd.alynchos.dndcharactertracker.Items;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,7 +24,6 @@ import com.dnd.alynchos.dndcharactertracker.Character.CharacterManager;
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
 import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Weapon;
 import com.dnd.alynchos.dndcharactertracker.R;
-import com.dnd.alynchos.dndcharactertracker.SaveData.FeedReaderDbHelper;
 
 public class InventoryFragment extends Fragment implements View.OnClickListener {
 
