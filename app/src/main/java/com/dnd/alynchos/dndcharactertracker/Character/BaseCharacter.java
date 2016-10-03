@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * Created by Alex Lynchosky on 12/22/2014.
+ * The core class for building a character
  */
 public class BaseCharacter {
 

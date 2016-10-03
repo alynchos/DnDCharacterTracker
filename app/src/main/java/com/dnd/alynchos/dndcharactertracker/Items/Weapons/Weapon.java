@@ -45,6 +45,10 @@ public class Weapon extends Item {
         for(Damage dam : damages) {
             sb.append(dam).append("\n");
         }
+        sb.append(" at ")
+                .append(range)
+                .append(" feet. Proficient: ")
+                .append(isProficient);
         return sb.toString();
     }
 

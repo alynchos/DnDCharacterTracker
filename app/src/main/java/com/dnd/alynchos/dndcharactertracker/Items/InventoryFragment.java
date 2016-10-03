@@ -411,25 +411,11 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
     DialogInterface.OnClickListener deleteInventory = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            AsyncTask<Void, Void, Integer> task = (new AsyncTask<Void, Void, Integer>() {
-                @Override
-                protected Integer doInBackground(Void... voids) {
-                    FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-                    assert feedReaderDbHelper != null;
-                    feedReaderDbHelper.deleteInventoryDataBase();
-                    CharacterManager characterManager = CharacterManager.getInstance();
-                    characterManager.deleteInventory();
-                    return 1;
-                }
-
-                @Override
-                protected void onPostExecute(Integer count) {
-                    Intent intent = new Intent();
-                    intent.setAction(CharacterManager.CLEAR_INV);
-                    getActivity().sendBroadcast(intent);
-                }
-            });
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            CharacterManager characterManager = CharacterManager.getInstance();
+            characterManager.deleteInventory();
+            Intent intent = new Intent();
+            intent.setAction(CharacterManager.CLEAR_INV);
+            getActivity().sendBroadcast(intent);
         }
     };
 
