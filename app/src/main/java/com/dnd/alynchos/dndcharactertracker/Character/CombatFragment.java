@@ -14,10 +14,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
@@ -44,6 +47,8 @@ public class CombatFragment extends Fragment {
     private TextView mModifyInitiativeText;
     private TextView mModifySpeedText;
     private FloatingActionButton mAddFab;
+    private RadioButton mRadioButtonAddCombatWeapon;
+    private RadioButton mRadioButtonAddCombatAmmo;
 
     /* Modify Attr elements */
     private AlertDialog mModifyElementDialog;
@@ -119,10 +124,27 @@ public class CombatFragment extends Fragment {
         mAddFab.setOnClickListener(fabClick);
     }
 
+    private void initAddCombatItemView() {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        mActiveView = inflater.inflate(R.layout.add_combat_item_layout, null);
+        RadioGroup rg = (RadioGroup) mActiveView.findViewById(R.id.radio_group_add_combat_item);
+        mRadioButtonAddCombatWeapon = (RadioButton) rg.findViewById(R.id.radio_button_add_combat_weapon);
+        mRadioButtonAddCombatWeapon.setOnClickListener(selectedCombatRadioItem);
+        mRadioButtonAddCombatAmmo = (RadioButton) rg.findViewById(R.id.radio_button_add_combat_ammo);
+        mRadioButtonAddCombatAmmo.setOnClickListener(selectedCombatRadioItem);
+    }
+
     private void initModifyElementView() {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         mActiveView = inflater.inflate(R.layout.modify_element_layout, null);
         mModifyElementEdit = (EditText) mActiveView.findViewById(R.id.edit_modify_value);
+    }
+
+    private void initSelectCombatItemView(boolean isWeapon) {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        mActiveView = inflater.inflate(R.layout.select_weapon_layout, null);
+        mInventoryList = (ListView) mActiveView.findViewById(R.id.inventory_list);
+        updateInventoryList(isWeapon);
     }
 
     /* End Init Methods */
@@ -175,9 +197,49 @@ public class CombatFragment extends Fragment {
     View.OnClickListener fabClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            
+            showAddCombatItemDialog();
         }
     };
+
+    View.OnClickListener selectedCombatRadioItem = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            StringBuilder title = new StringBuilder();
+            switch (v.getId()) {
+                case R.id.radio_button_add_combat_weapon:
+                    initSelectCombatItemView(true);
+                    title.append(getActivity().getString(R.string.text_weapon));
+                    break;
+                case R.id.radio_button_add_combat_ammo:
+                    initSelectCombatItemView(false);
+                    title.append(getActivity().getString(R.string.text_ammunition_title));
+                    break;
+            }
+            AlertDialog selectCombatItem = new AlertDialog.Builder(getActivity())
+                    .setTitle("Add new " + title.toString())
+                    .setView(mActiveView)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .create();
+            selectCombatItem.show();
+        }
+    };
+
+    private void showAddCombatItemDialog() {
+        initAddCombatItemView();
+        AlertDialog addCombatItemAlertDialog = new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.text_add_combat_item)
+                .setView(mActiveView)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        getActivity().sendBroadcast(new Intent(CharacterManager.HIDE_KEYBOARD));
+                    }
+                })
+                .create();
+        addCombatItemAlertDialog.show();
+    }
 
     /* Double click modify listener */
     View.OnTouchListener viewTouched = new View.OnTouchListener() {
@@ -283,4 +345,50 @@ public class CombatFragment extends Fragment {
             }
         }
     };
+
+    AdapterView.OnItemClickListener inventoryOnClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            CharacterManager characterManager = CharacterManager.getInstance();
+            String name = (String) parent.getItemAtPosition(position);
+            Item retrieved = characterManager.getItem(name);
+            if(retrieved instanceof  Weapon){
+                selectedWeapon = (Weapon) retrieved;
+            }
+            else{
+                selectedAmmo = retrieved;
+                if (selectedAmmo == null) {
+                    logger.debug("Could not find item!");
+                }
+            }
+            if((mModifyElementEdit != null && mModifyElementEdit.getText().length() > 0) ||
+                    !(retrieved instanceof Weapon)){
+                mModifyElementDialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+            }
+            else{
+                for(int i = 0; i < mInventoryList.getCount(); i++){
+                    View curr = mInventoryList.getChildAt(i);
+                    curr.setBackgroundColor(getResources().getColor(R.color.white));
+                }
+                view.setBackgroundColor(getResources().getColor(R.color.light_grey));
+            }
+        }
+    };
+
+    /* Private Helpers */
+    private void updateInventoryList(boolean isWeapon) {
+        CharacterManager characterManager = CharacterManager.getInstance();
+        String names[];
+        if (isWeapon) {
+            names = characterManager.getInventoryWeaponNames(true);
+        } else {
+            names = characterManager.getInventoryWeaponNames(false);
+        }
+
+        mInventoryArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,
+                android.R.id.text1, names);
+
+        mInventoryList.setAdapter(mInventoryArrayAdapter);
+        mInventoryList.setOnItemClickListener(inventoryOnClickListener);
+    }
 }

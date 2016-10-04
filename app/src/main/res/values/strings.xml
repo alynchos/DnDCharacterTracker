@@ -114,5 +114,8 @@
     <string name="text_current_health_title">Current Health</string>
     <string name="text_weapons_title">Weapons</string>
     <string name="text_ammunition_title">Ammunition</string>
+    <string name="text_weapon">Weapon</string>
+    <string name="text_add_combat_item">Add Combat Item</string>
+    <string name="text_attack_bonus">Attack Bonus</string>
 
 </resources>

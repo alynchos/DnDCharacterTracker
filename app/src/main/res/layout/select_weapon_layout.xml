@@ -3,17 +3,9 @@
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/edit_atk_bns"
-        android:hint="Attack Bonus"
-        android:inputType="number|numberSigned"
-        android:imeOptions="actionDone"/>
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/inventory_list"
-        android:layout_centerHorizontal="true" />
+        android:id="@+id/inventory_list"/>
 
 </LinearLayout>

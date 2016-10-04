@@ -142,7 +142,6 @@ public class CombatActivity extends Activity implements View.OnClickListener {
         LayoutInflater inflater = getLayoutInflater();
         mActiveView = inflater.inflate(R.layout.select_weapon_layout, null);
         mInventoryList = (ListView) mActiveView.findViewById(R.id.inventory_list);
-        mModifyElementEdit = (EditText) mActiveView.findViewById(R.id.edit_atk_bns);
         updateInventoryList(true);
     }
 
