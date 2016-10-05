@@ -17,6 +17,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Alex Lynchosky on 12/22/2014.
@@ -61,7 +62,8 @@ public class CharacterManager {
         if (mCharacterManager == null) {
             mCharacterManager = new CharacterManager();
         }
-        if(mCharacterManager.mCharacter == null) mCharacterManager.setCharacter(new BaseCharacter());
+        if (mCharacterManager.mCharacter == null)
+            mCharacterManager.setCharacter(new BaseCharacter());
         return mCharacterManager;
     }
 
@@ -197,7 +199,7 @@ public class CharacterManager {
     }
 
     public BaseCharacter getCharacter() {
-        if(mCharacter == null) mCharacter = new BaseCharacter();
+        if (mCharacter == null) mCharacter = new BaseCharacter();
         return mCharacter;
     }
 
@@ -408,36 +410,18 @@ public class CharacterManager {
         return names;
     }
 
-    // Return either the list of weapons, or the list of everything except weapons
-    public String[] getInventoryWeaponNames(boolean wantWeapons) {
+    // Return the list of weapons
+    public Weapon[] getInventoryWeapons() {
         LinkedList<Weapon> weapons = new LinkedList<>();
-        LinkedList<Item> items = new LinkedList<>();
-        Item list[] = mCharacter.inventory.values().toArray(new Item[mCharacter.inventory.size()]);
+        Item[] list = mCharacter.inventory.values().toArray(new Item[mCharacter.inventory.size()]);
         // Find the weapons
-        for (Item aList : list) {
-            if (aList instanceof Weapon) {
-                if (wantWeapons) {
-                    weapons.add((Weapon) aList);
-                }
-            } else {
-                if (!wantWeapons) {
-                    items.add(aList);
-                }
+        for (Item item : list) {
+            if (item instanceof Weapon) {
+                weapons.add((Weapon) item);
             }
         }
-        String names[];
-        if (wantWeapons) {
-            names = new String[weapons.size()];
-            for (int i = 0; i < names.length; i++) {
-                names[i] = weapons.get(i).name;
-            }
-        } else {
-            names = new String[items.size()];
-            for (int i = 0; i < names.length; i++) {
-                names[i] = items.get(i).name;
-            }
-        }
-        return names;
+
+        return weapons.toArray(new Weapon[weapons.size()]);
     }
 
 
@@ -587,8 +571,7 @@ public class CharacterManager {
             String json = retrieve.getString(0);
             logger.debug("Loading character[" + character_uuid + "]: " + json);
             mCharacter = gson.fromJson(json, type);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             logger.error("Unable to retrieve character[" + character_uuid + "] from database!");
         }

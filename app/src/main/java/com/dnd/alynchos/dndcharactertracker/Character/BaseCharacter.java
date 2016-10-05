@@ -126,6 +126,10 @@ public class BaseCharacter {
         return total;
     }
 
+    public HashMap<String, Item> getInventory() {
+        return inventory;
+    }
+
     public Item getItem(String name){
         Item item = inventory.get(name);
         if(item == null){

@@ -180,13 +180,13 @@ public class CombatActivity extends Activity implements View.OnClickListener {
         CharacterManager characterManager = CharacterManager.getInstance();
         String names[];
         if (isWeapon) {
-            names = characterManager.getInventoryWeaponNames(true);
+            //names = characterManager.getInventoryWeaponNames(true);
         } else {
-            names = characterManager.getInventoryWeaponNames(false);
+            //names = characterManager.getInventoryWeaponNames(false);
         }
 
-        mInventoryArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-                android.R.id.text1, names);
+        //mInventoryArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+                //android.R.id.text1, names);
 
         mInventoryList.setAdapter(mInventoryArrayAdapter);
         mInventoryList.setOnItemClickListener(inventoryOnClickListener);

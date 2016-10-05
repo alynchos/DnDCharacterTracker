@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -26,8 +27,11 @@ import android.widget.TextView;
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
 import com.dnd.alynchos.dndcharactertracker.DnDTabBarActivity;
 import com.dnd.alynchos.dndcharactertracker.Items.Item;
+import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Damage;
 import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Weapon;
 import com.dnd.alynchos.dndcharactertracker.R;
+
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -49,6 +53,10 @@ public class CombatFragment extends Fragment {
     private FloatingActionButton mAddFab;
     private RadioButton mRadioButtonAddCombatWeapon;
     private RadioButton mRadioButtonAddCombatAmmo;
+    private ListView mWeaponsListView;
+    private ListView mAmmoListView;
+    private Button mAddWeaponButton;
+    private Button mAddAmmoButton;
 
     /* Modify Attr elements */
     private AlertDialog mModifyElementDialog;
@@ -120,8 +128,25 @@ public class CombatFragment extends Fragment {
         currView.setOnTouchListener(viewTouched);
         mModifySpeedText = (TextView) currView.findViewById(R.id.value_speed);
 
+        CharacterManager characterManager = CharacterManager.getInstance();
+        mWeaponsListView = (ListView) view.findViewById(R.id.list_combat_weapons);
+        mWeaponsListView.setAdapter(new WeaponListAdapter(getActivity(), characterManager.getInventoryWeapons()));
+        mAddWeaponButton = (Button) view.findViewById(R.id.but_add_weapon);
+        mAddWeaponButton.setOnClickListener(buttonClick);
+        if(mWeaponsListView.getAdapter().getCount() > 0) {
+            mAddWeaponButton.setVisibility(View.GONE);
+        }
+
+        mAmmoListView = (ListView) view.findViewById(R.id.list_combat_ammo);
+        mAmmoListView.setAdapter(new WeaponListAdapter(getActivity(), characterManager.getInventoryWeapons()));
+        mAddAmmoButton = (Button) view.findViewById(R.id.but_add_ammo);
+        mAddAmmoButton.setOnClickListener(buttonClick);
+        if(mAmmoListView.getAdapter().getCount() > 0) {
+            mAddAmmoButton.setVisibility(View.GONE);
+        }
+
         mAddFab = (FloatingActionButton) view.findViewById(R.id.fab_add_to_combat);
-        mAddFab.setOnClickListener(fabClick);
+        mAddFab.setOnClickListener(buttonClick);
     }
 
     private void initAddCombatItemView() {
@@ -194,10 +219,19 @@ public class CombatFragment extends Fragment {
     /* End Update Methods */
 
     /* Add new combat item listener */
-    View.OnClickListener fabClick = new View.OnClickListener() {
+    View.OnClickListener buttonClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            showAddCombatItemDialog();
+            switch (v.getId()) {
+                case R.id.but_add_ammo:
+                    break;
+                case R.id.but_add_weapon:
+                    break;
+                case R.id.fab_add_to_combat:
+                    showAddCombatItemDialog();
+                    break;
+            }
+
         }
     };
 
@@ -352,21 +386,19 @@ public class CombatFragment extends Fragment {
             CharacterManager characterManager = CharacterManager.getInstance();
             String name = (String) parent.getItemAtPosition(position);
             Item retrieved = characterManager.getItem(name);
-            if(retrieved instanceof  Weapon){
+            if (retrieved instanceof Weapon) {
                 selectedWeapon = (Weapon) retrieved;
-            }
-            else{
+            } else {
                 selectedAmmo = retrieved;
                 if (selectedAmmo == null) {
                     logger.debug("Could not find item!");
                 }
             }
-            if((mModifyElementEdit != null && mModifyElementEdit.getText().length() > 0) ||
-                    !(retrieved instanceof Weapon)){
+            if ((mModifyElementEdit != null && mModifyElementEdit.getText().length() > 0) ||
+                    !(retrieved instanceof Weapon)) {
                 mModifyElementDialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
-            }
-            else{
-                for(int i = 0; i < mInventoryList.getCount(); i++){
+            } else {
+                for (int i = 0; i < mInventoryList.getCount(); i++) {
                     View curr = mInventoryList.getChildAt(i);
                     curr.setBackgroundColor(getResources().getColor(R.color.white));
                 }
@@ -380,9 +412,10 @@ public class CombatFragment extends Fragment {
         CharacterManager characterManager = CharacterManager.getInstance();
         String names[];
         if (isWeapon) {
-            names = characterManager.getInventoryWeaponNames(true);
+            //names = characterManager.getInventoryWeaponNames(true);
+            names = new String[] {"blah???"};
         } else {
-            names = characterManager.getInventoryWeaponNames(false);
+            names = characterManager.getInventoryItemNames();
         }
 
         mInventoryArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,
@@ -390,5 +423,56 @@ public class CombatFragment extends Fragment {
 
         mInventoryList.setAdapter(mInventoryArrayAdapter);
         mInventoryList.setOnItemClickListener(inventoryOnClickListener);
+    }
+
+    /* Private class list adapters */
+    private class WeaponListAdapter extends BaseAdapter {
+
+        Context context;
+        Weapon[] data;
+        private LayoutInflater inflater = null;
+
+        public WeaponListAdapter(Context context, Weapon[] data) {
+            // TODO Auto-generated constructor stub
+            this.context = context;
+            this.data = data;
+            inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+
+        @Override
+        public int getCount() {
+            // TODO Auto-generated method stub
+            return data.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            // TODO Auto-generated method stub
+            return data[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            // TODO Auto-generated method stub
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View vi = convertView;
+            if (vi == null) {
+                vi = inflater.inflate(R.layout.weapon_equip_layout, null);
+            }
+            ((TextView) vi.findViewById(R.id.text_weapon1_name)).setText(data[position].name);
+            int hit_total = data[position].hit + data[position].hit_bonus;
+            ((TextView) vi.findViewById(R.id.text_weapon1_atk_bns)).setText(String.format(Locale.getDefault(), "+%d", hit_total));
+            StringBuilder damage_list = new StringBuilder();
+            for (Damage damage : ((Damage[]) data[position].damages.toArray())) {
+                damage_list.append(damage);
+            }
+            ((TextView) vi.findViewById(R.id.text_weapon1_damage)).setText(damage_list.toString());
+            return vi;
+        }
     }
 }

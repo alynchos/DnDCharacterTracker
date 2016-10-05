@@ -117,5 +117,7 @@
     <string name="text_weapon">Weapon</string>
     <string name="text_add_combat_item">Add Combat Item</string>
     <string name="text_attack_bonus">Attack Bonus</string>
+    <string name="text_add_weapon">Add Weapon</string>
+    <string name="text_add_ammunition">Add Ammunition</string>
 
 </resources>

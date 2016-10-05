@@ -10,9 +10,9 @@
         android:orientation="horizontal"
         android:layout_marginTop="10dp">
         <TextView
+            android:id="@+id/text_weapon1_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/text_weapon1_name"
             android:text="@string/text_weapon_name"
             android:maxLength="22"
             android:ellipsize="end"
@@ -20,17 +20,17 @@
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"/>
         <TextView
+            android:id="@+id/text_weapon1_atk_bns"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/text_weapon1_atk_bns"
             android:text="@string/text_weapon_base_add_default_val"
             android:textSize="@dimen/small_font"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"/>
         <TextView
+            android:id="@+id/text_weapon1_damage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/text_weapon1_damage"
             android:text="@string/text_weapon_default_val"
             android:maxLength="18"
             android:ellipsize="end"

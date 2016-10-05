@@ -1,14 +1,14 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/light_tan"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.dnd.alynchos.dndcharactertracker.Character.CombatFragment"
-    android:background="@color/light_tan">
+    tools:context="com.dnd.alynchos.dndcharactertracker.Character.CombatFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -27,28 +27,31 @@
                 android:gravity="center">
 
                 <!-- Armor -->
-                <include layout="@layout/armor_layout"
+                <include
+                    android:id="@+id/include_armor_layout"
+                    layout="@layout/armor_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/default_padding"
-                    android:id="@+id/include_armor_layout"
-                    android:layout_gravity="center"/>
+                    android:layout_gravity="center"
+                    android:layout_margin="@dimen/default_padding" />
 
                 <!-- Initiative -->
-                <include layout="@layout/initiative_layout"
+                <include
+                    android:id="@+id/include_initiative_layout"
+                    layout="@layout/initiative_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/default_padding"
-                    android:id="@+id/include_initiative_layout"
-                    android:layout_gravity="center"/>
+                    android:layout_gravity="center"
+                    android:layout_margin="@dimen/default_padding" />
 
                 <!-- Speed -->
-                <include layout="@layout/speed_layout"
+                <include
+                    android:id="@+id/include_speed_layout"
+                    layout="@layout/speed_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/default_padding"
-                    android:id="@+id/include_speed_layout"
-                    android:layout_gravity="center"/>
+                    android:layout_gravity="center"
+                    android:layout_margin="@dimen/default_padding" />
 
             </LinearLayout>
 
@@ -56,39 +59,54 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/large_font"
+                android:background="@drawable/underline"
                 android:text="@string/text_weapons_title"
-                android:background="@drawable/underline"/>
+                android:textSize="@dimen/large_font" />
 
-            <!-- Weapon Equip -->
-            <include layout="@layout/weapon_equip_layout"
-                android:layout_width="fill_parent"
+            <!-- Weapon Equip List -->
+            <ListView
+                android:id="@+id/list_combat_weapons"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:id="@+id/include_weapon_layout"/>
+                android:visibility="gone">
+            </ListView>
+
+            <!-- Button that appears if the list is empty -->
+            <Button
+                android:id="@+id/but_add_weapon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_add_weapon"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/large_font"
+                android:background="@drawable/underline"
                 android:text="@string/text_ammunition_title"
-                android:background="@drawable/underline"/>
-            <!-- Ammo -->
-            <include layout="@layout/ammo_layout"
-                android:layout_width="fill_parent"
+                android:textSize="@dimen/large_font" />
+            <!-- Ammo Equip List -->
+            <ListView
+                android:id="@+id/list_combat_ammo"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="10dp"
-                android:id="@+id/include_ammo_layout"/>
+                android:visibility="gone">
+            </ListView>
 
-            <!-- Health -->
-            <include layout="@layout/health_layout"
+            <!-- Button that appears if the list is empty -->
+            <Button
+                android:id="@+id/but_add_ammo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:text="@string/text_add_ammunition"/>
+
+            <!-- Health -->
+            <include
                 android:id="@+id/include_health_layout"
-                android:layout_gravity="center"/>
+                layout="@layout/health_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp" />
         </LinearLayout>
     </ScrollView>
 
@@ -97,8 +115,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="bottom|end"
-        app:borderWidth="0dp"
         android:backgroundTint="@color/colorPrimary"
-        android:src="@drawable/plus_sign_grey"/>
+        android:src="@drawable/plus_sign_grey"
+        app:borderWidth="0dp" />
 
 </FrameLayout>
