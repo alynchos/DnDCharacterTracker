@@ -181,10 +181,6 @@ public class DnDTabBarActivity extends AppCompatActivity
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.addOnPageChangeListener(pagerChangeListener);
-        CharacterManager characterManager = CharacterManager.getInstance();
-        if (characterManager.getCharacter() == null) {
-            characterManager.setCharacter(new BaseCharacter());
-        }
     }
 
     @Override

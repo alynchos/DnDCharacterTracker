@@ -61,6 +61,7 @@ public class CharacterManager {
         if (mCharacterManager == null) {
             mCharacterManager = new CharacterManager();
         }
+        if(mCharacterManager.mCharacter == null) mCharacterManager.setCharacter(new BaseCharacter());
         return mCharacterManager;
     }
 
@@ -196,6 +197,7 @@ public class CharacterManager {
     }
 
     public BaseCharacter getCharacter() {
+        if(mCharacter == null) mCharacter = new BaseCharacter();
         return mCharacter;
     }
 

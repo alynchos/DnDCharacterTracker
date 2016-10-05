@@ -57,7 +57,7 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
         // List
         CharacterManager characterManager = CharacterManager.getInstance();
         String names[] = characterManager.getInventoryItemNames();
-        mInventoryArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
+        mInventoryArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,
                 android.R.id.text1, names);
     }
 
