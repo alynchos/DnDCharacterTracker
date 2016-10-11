@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.design.widget.FloatingActionButton;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,6 +21,7 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
 import com.dnd.alynchos.dndcharactertracker.DnDTabBarActivity;
@@ -30,6 +29,8 @@ import com.dnd.alynchos.dndcharactertracker.Items.Item;
 import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Damage;
 import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Weapon;
 import com.dnd.alynchos.dndcharactertracker.R;
+import com.dnd.alynchos.dndcharactertracker.Utils.AreYouSureDialog;
+import com.dnd.alynchos.dndcharactertracker.Utils.ExpandedListView;
 
 import java.util.Locale;
 
@@ -53,8 +54,8 @@ public class CombatFragment extends Fragment {
     private FloatingActionButton mAddFab;
     private RadioButton mRadioButtonAddCombatWeapon;
     private RadioButton mRadioButtonAddCombatAmmo;
-    private ListView mWeaponsListView;
-    private ListView mAmmoListView;
+    private ExpandedListView mWeaponsListView;
+    private ExpandedListView mAmmoListView;
     private Button mAddWeaponButton;
     private Button mAddAmmoButton;
 
@@ -66,7 +67,7 @@ public class CombatFragment extends Fragment {
 
     /* Modify Weapon / Ammo elements */
     private ListView mInventoryList;
-    private ArrayAdapter<String> mInventoryArrayAdapter;
+    private BaseAdapter mInventoryArrayAdapter;
     private Weapon selectedWeapon;
     private Item selectedAmmo;
 
@@ -119,6 +120,18 @@ public class CombatFragment extends Fragment {
         currView = view.findViewById(R.id.include_health_layout);
         currView.setOnTouchListener(viewTouched);
         mModifyHealthText = (TextView) currView.findViewById(R.id.value_health);
+        currView.findViewById(R.id.button_add_health).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                incrementHealth();
+            }
+        });
+        currView.findViewById(R.id.button_subtract_health).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decrementHealth();
+            }
+        });
 
         currView = view.findViewById(R.id.include_initiative_layout);
         currView.setOnTouchListener(viewTouched);
@@ -128,23 +141,14 @@ public class CombatFragment extends Fragment {
         currView.setOnTouchListener(viewTouched);
         mModifySpeedText = (TextView) currView.findViewById(R.id.value_speed);
 
-        CharacterManager characterManager = CharacterManager.getInstance();
-        mWeaponsListView = (ListView) view.findViewById(R.id.list_combat_weapons);
-        mWeaponsListView.setAdapter(new WeaponListAdapter(getActivity(), characterManager.getInventoryWeapons()));
+        mWeaponsListView = (ExpandedListView) view.findViewById(R.id.list_combat_weapons);
         mAddWeaponButton = (Button) view.findViewById(R.id.but_add_weapon);
         mAddWeaponButton.setOnClickListener(buttonClick);
-        if(mWeaponsListView.getAdapter().getCount() > 0) {
-            mAddWeaponButton.setVisibility(View.GONE);
-        }
-
-        mAmmoListView = (ListView) view.findViewById(R.id.list_combat_ammo);
-        mAmmoListView.setAdapter(new WeaponListAdapter(getActivity(), characterManager.getInventoryWeapons()));
+        refreshEquippedWeaponsList();
+        mAmmoListView = (ExpandedListView) view.findViewById(R.id.list_combat_ammo);
         mAddAmmoButton = (Button) view.findViewById(R.id.but_add_ammo);
         mAddAmmoButton.setOnClickListener(buttonClick);
-        if(mAmmoListView.getAdapter().getCount() > 0) {
-            mAddAmmoButton.setVisibility(View.GONE);
-        }
-
+        refreshAmmoList();
         mAddFab = (FloatingActionButton) view.findViewById(R.id.fab_add_to_combat);
         mAddFab.setOnClickListener(buttonClick);
     }
@@ -193,16 +197,10 @@ public class CombatFragment extends Fragment {
                 mModifySpeedText.setText("" + characterManager.getSpeed());
                 break;
             case WEAPON:
-                // Weapons
-                selectedWeapon = (Weapon) characterManager.getItem(characterManager.getWeaponName(0));
-                if (selectedWeapon != null) {
-                }
+                refreshEquippedWeaponsList();
                 break;
             case AMMO:
-                // Ammo
-                selectedAmmo = characterManager.getItem(characterManager.getAmmo());
-                if (selectedAmmo != null) {
-                }
+                refreshAmmoList();
                 break;
             case ALL:
                 logger.debug("Updating combat UI");
@@ -222,16 +220,20 @@ public class CombatFragment extends Fragment {
     View.OnClickListener buttonClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            CharacterManager characterManager = CharacterManager.getInstance();
             switch (v.getId()) {
                 case R.id.but_add_ammo:
+                    characterManager.createTestAmmo();
+                    refreshAmmoList();
                     break;
                 case R.id.but_add_weapon:
+                    characterManager.createTestWeapons();
+                    refreshEquippedWeaponsList();
                     break;
                 case R.id.fab_add_to_combat:
                     showAddCombatItemDialog();
                     break;
             }
-
         }
     };
 
@@ -410,22 +412,154 @@ public class CombatFragment extends Fragment {
     /* Private Helpers */
     private void updateInventoryList(boolean isWeapon) {
         CharacterManager characterManager = CharacterManager.getInstance();
-        String names[];
         if (isWeapon) {
-            //names = characterManager.getInventoryWeaponNames(true);
-            names = new String[] {"blah???"};
+            mInventoryArrayAdapter = new WeaponListAdapter(getActivity(), characterManager.getInventoryWeapons());
         } else {
-            names = characterManager.getInventoryItemNames();
+            mInventoryArrayAdapter = new WeaponListAdapter(getActivity(), characterManager.getInventoryWeapons());
         }
-
-        mInventoryArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,
-                android.R.id.text1, names);
-
         mInventoryList.setAdapter(mInventoryArrayAdapter);
         mInventoryList.setOnItemClickListener(inventoryOnClickListener);
     }
 
+    private void equipWeapon(Weapon weapon) {
+        CharacterManager characterManager = CharacterManager.getInstance();
+        characterManager.equipWeapon(weapon);
+        refreshEquippedWeaponsList();
+        Toast.makeText(getActivity(), R.string.text_weapon_equipped, Toast.LENGTH_SHORT).show();
+    }
+
+    private void unequipWeapon(int position) {
+        CharacterManager characterManager = CharacterManager.getInstance();
+        characterManager.unequipWeapon(position);
+        refreshEquippedWeaponsList();
+        Toast.makeText(getActivity(), R.string.text_weapon_unequipped, Toast.LENGTH_SHORT).show();
+    }
+
+    private void incrementAmmo(int position) {
+        adjustAmmo(position, 1);
+    }
+
+    private void decrementAmmo(int position) {
+        adjustAmmo(position, -1);
+    }
+
+    private void adjustAmmo(int position, int amount) {
+        CharacterManager characterManager = CharacterManager.getInstance();
+        characterManager.incrementAmmo(position);
+        View currAmmoView = mAmmoListView.getChildAt(position);
+        try {
+            TextView ammoValText = (TextView) currAmmoView.findViewById(R.id.text_ammo_amount);
+            int currAmount = Integer.parseInt(ammoValText.getText().toString());
+            ammoValText.setText(String.valueOf(currAmount + amount));
+        }
+        catch (Exception e) {
+            logger.error("Could not retrieve the ammo amount, not an integer");
+            Toast.makeText(getActivity(), R.string.text_invalid_ammo_amount, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void incrementHealth() {
+        adjustHealth(1);
+    }
+
+    private void decrementHealth() {
+        adjustHealth(-1);
+    }
+
+    private void adjustHealth( int amount) {
+        CharacterManager characterManager = CharacterManager.getInstance();
+        characterManager.setHealth(characterManager.getHealth() + amount);
+        try {
+            int currAmount = Integer.parseInt(mModifyHealthText.getText().toString());
+            mModifyHealthText.setText(String.valueOf(currAmount + amount));
+        }
+        catch (Exception e) {
+            logger.error("Could not retrieve the health amount, not an integer");
+            Toast.makeText(getActivity(), R.string.text_invalid_health_amount, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void refreshEquippedWeaponsList() {
+        CharacterManager characterManager = CharacterManager.getInstance();
+        mWeaponsListView.setAdapter(new WeaponListAdapter(getActivity(), characterManager.getEquipedWeapons()));
+        if (mWeaponsListView.getAdapter().getCount() > 0) {
+            mAddWeaponButton.setVisibility(View.GONE);
+            mWeaponsListView.setVisibility(View.VISIBLE);
+        } else {
+            mAddWeaponButton.setVisibility(View.VISIBLE);
+            mWeaponsListView.setVisibility(View.GONE);
+        }
+    }
+
+    private void refreshAmmoList() {
+        CharacterManager characterManager = CharacterManager.getInstance();
+        mAmmoListView.setAdapter(new AmmoListAdapter(getActivity(), characterManager.getEquipedAmmo()));
+        if (mAmmoListView.getAdapter().getCount() > 0) {
+            mAddAmmoButton.setVisibility(View.GONE);
+            mAmmoListView.setVisibility(View.VISIBLE);
+        } else {
+            mAddAmmoButton.setVisibility(View.VISIBLE);
+            mAmmoListView.setVisibility(View.GONE);
+        }
+    }
+
     /* Private class list adapters */
+    private class AmmoListAdapter extends BaseAdapter {
+
+        Context context;
+        Item[] data;
+        private LayoutInflater inflater = null;
+
+        public AmmoListAdapter(Context context, Item[] data) {
+            // TODO Auto-generated constructor stub
+            this.context = context;
+            this.data = data;
+            inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+
+        @Override
+        public int getCount() {
+            // TODO Auto-generated method stub
+            return data.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            // TODO Auto-generated method stub
+            return data[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            // TODO Auto-generated method stub
+            return position;
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            View vi = convertView;
+            if (vi == null) {
+                vi = inflater.inflate(R.layout.ammo_layout, null);
+            }
+            ((TextView) vi.findViewById(R.id.text_ammo_name)).setText(data[position].name);
+            ((TextView) vi.findViewById(R.id.text_ammo_amount)).setText(String.valueOf(data[position].amount));
+            vi.findViewById(R.id.button_add_ammo).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    incrementAmmo(position);
+                }
+            });
+            vi.findViewById(R.id.button_subtract_ammo).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    decrementAmmo(position);
+                }
+            });
+            return vi;
+        }
+    }
+
     private class WeaponListAdapter extends BaseAdapter {
 
         Context context;
@@ -459,7 +593,7 @@ public class CombatFragment extends Fragment {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             View vi = convertView;
             if (vi == null) {
                 vi = inflater.inflate(R.layout.weapon_equip_layout, null);
@@ -468,10 +602,25 @@ public class CombatFragment extends Fragment {
             int hit_total = data[position].hit + data[position].hit_bonus;
             ((TextView) vi.findViewById(R.id.text_weapon1_atk_bns)).setText(String.format(Locale.getDefault(), "+%d", hit_total));
             StringBuilder damage_list = new StringBuilder();
-            for (Damage damage : ((Damage[]) data[position].damages.toArray())) {
+            for (Damage damage : data[position].damages) {
                 damage_list.append(damage);
             }
             ((TextView) vi.findViewById(R.id.text_weapon1_damage)).setText(damage_list.toString());
+            vi.findViewById(R.id.but_remove_equipped_weapon).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new AreYouSureDialog(DnDTabBarActivity.getInstance(),
+                            "Unequip this weapon?",
+                            (new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    unequipWeapon(position);
+                                }
+                            }),
+                            null)
+                            .show();
+                }
+            });
             return vi;
         }
     }

@@ -64,19 +64,20 @@
                 android:textSize="@dimen/large_font" />
 
             <!-- Weapon Equip List -->
-            <ListView
+            <com.dnd.alynchos.dndcharactertracker.Utils.ExpandedListView
                 android:id="@+id/list_combat_weapons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone">
-            </ListView>
+                android:scrollbars="none">
+            </com.dnd.alynchos.dndcharactertracker.Utils.ExpandedListView>
 
             <!-- Button that appears if the list is empty -->
             <Button
                 android:id="@+id/but_add_weapon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/text_add_weapon"/>
+                android:text="@string/text_add_weapon"
+                android:visibility="gone"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -85,12 +86,12 @@
                 android:text="@string/text_ammunition_title"
                 android:textSize="@dimen/large_font" />
             <!-- Ammo Equip List -->
-            <ListView
+            <com.dnd.alynchos.dndcharactertracker.Utils.ExpandedListView
                 android:id="@+id/list_combat_ammo"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
-            </ListView>
+                android:scrollbars="none"
+                android:layout_height="wrap_content">
+            </com.dnd.alynchos.dndcharactertracker.Utils.ExpandedListView>
 
             <!-- Button that appears if the list is empty -->
             <Button

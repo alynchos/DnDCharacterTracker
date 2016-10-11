@@ -108,7 +108,7 @@
     <string name="text_minus">-</string>
     <string name="text_plus">+</string>
     <string name="text_none">none</string>
-    <string name="text_empty">empty</string>
+    <string name="text_empty">0</string>
     <string name="text_ammo">Ammo</string>
     <string name="hint_new_value">new value</string>
     <string name="text_current_health_title">Current Health</string>
@@ -119,5 +119,12 @@
     <string name="text_attack_bonus">Attack Bonus</string>
     <string name="text_add_weapon">Add Weapon</string>
     <string name="text_add_ammunition">Add Ammunition</string>
+    <string name="text_remove_equipped_weapon">Remove equipped weapon</string>
+    <string name="text_remove_equipped_ammo">Remove equipped ammunition</string>
+    <string name="text_are_you_sure">Are you sure you want to…</string>
+    <string name="text_weapon_equipped">Weapon equipped</string>
+    <string name="text_weapon_unequipped">Weapon unequipped</string>
+    <string name="text_invalid_ammo_amount">Invalid ammunition amount</string>
+    <string name="text_invalid_health_amount">Invalid health amount</string>
 
 </resources>

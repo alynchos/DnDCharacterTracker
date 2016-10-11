@@ -18,5 +18,7 @@
     <!-- Specifics -->
     <dimen name="level_display_size">64dp</dimen>
     <dimen name="level_display_size_buffer">74dp</dimen>
+    <!-- Image Sizes -->
+    <dimen name="small_image">25dp</dimen>
 
 </resources>

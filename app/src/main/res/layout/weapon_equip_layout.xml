@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/light_grey">
+    android:orientation="horizontal"
+    android:background="@color/light_grey"
+    android:layout_margin="@dimen/default_padding"
+    android:padding="@dimen/default_padding"
+    android:gravity="center_vertical"
+    android:weightSum="10.0">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="10dp">
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="9"
+        android:gravity="center_vertical">
         <TextView
             android:id="@+id/text_weapon1_name"
             android:layout_width="wrap_content"
@@ -17,16 +21,14 @@
             android:maxLength="22"
             android:ellipsize="end"
             android:singleLine="true"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"/>
+            android:layout_margin="@dimen/minimum_padding"/>
         <TextView
             android:id="@+id/text_weapon1_atk_bns"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/text_weapon_base_add_default_val"
             android:textSize="@dimen/small_font"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"/>
+            android:layout_margin="@dimen/minimum_padding"/>
         <TextView
             android:id="@+id/text_weapon1_damage"
             android:layout_width="wrap_content"
@@ -36,8 +38,16 @@
             android:ellipsize="end"
             android:singleLine="true"
             android:textSize="@dimen/small_font"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"/>
+            android:layout_margin="@dimen/minimum_padding"/>
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/but_remove_equipped_weapon"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@null"
+        android:src="@android:drawable/ic_delete"
+        android:contentDescription="@string/text_remove_equipped_weapon" />
 
 </LinearLayout>

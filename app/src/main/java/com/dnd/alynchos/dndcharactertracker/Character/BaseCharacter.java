@@ -2,6 +2,7 @@ package com.dnd.alynchos.dndcharactertracker.Character;
 
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
 import com.dnd.alynchos.dndcharactertracker.Items.Item;
+import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Weapon;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -24,8 +25,8 @@ public class BaseCharacter {
     public String background = " ";
     public int age;
     public int health, armor, initiative, speed;
-    public List<String> weapons = new LinkedList<>();
-    public List<String> ammo = new LinkedList<>();
+    public List<Weapon> weapons = new LinkedList<>();
+    public List<Item> ammo = new LinkedList<>();
     public int str, dex, con, intel, wis, chr;
     public int plat, gold, silver, copper;
     public int experience, level = 1;

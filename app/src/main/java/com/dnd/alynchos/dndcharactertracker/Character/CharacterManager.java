@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
 import com.dnd.alynchos.dndcharactertracker.Items.Item;
+import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Damage;
 import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Weapon;
 import com.dnd.alynchos.dndcharactertracker.SaveData.FeedReaderDbHelper;
 import com.google.gson.Gson;
@@ -18,6 +19,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Alex Lynchosky on 12/22/2014.
@@ -174,8 +176,8 @@ public class CharacterManager {
         return mCharacter.armor;
     }
 
-    public String getAmmo() {
-        return " ";
+    public Item[] getAmmo() {
+        return mCharacter.ammo.toArray(new Item[mCharacter.ammo.size()]);
     }
 
     public int getHealth() {
@@ -190,12 +192,12 @@ public class CharacterManager {
         return mCharacter.speed;
     }
 
-    public String getWeaponName(int num) {
-        if (num >= mCharacter.weapons.size()) {
-            logger.error("Invalid index for weapons: " + num);
-            return null;
-        }
-        return mCharacter.weapons.get(num);
+    public Item[] getEquipedAmmo() {
+        return mCharacter.ammo.toArray(new Item[mCharacter.ammo.size()]);
+    }
+
+    public Weapon[] getEquipedWeapons() {
+        return mCharacter.weapons.toArray(new Weapon[mCharacter.weapons.size()]);
     }
 
     public BaseCharacter getCharacter() {
@@ -410,7 +412,6 @@ public class CharacterManager {
         return names;
     }
 
-    // Return the list of weapons
     public Weapon[] getInventoryWeapons() {
         LinkedList<Weapon> weapons = new LinkedList<>();
         Item[] list = mCharacter.inventory.values().toArray(new Item[mCharacter.inventory.size()]);
@@ -420,7 +421,6 @@ public class CharacterManager {
                 weapons.add((Weapon) item);
             }
         }
-
         return weapons.toArray(new Weapon[weapons.size()]);
     }
 
@@ -432,6 +432,60 @@ public class CharacterManager {
     public void modItem(String name, Item item) {
         modifyItemDatabase(name, item);
         mCharacter.modItem(name, item);
+    }
+
+    public void incrementAmmo(int position) {
+        mCharacter.ammo.get(position).amount += 1;
+    }
+
+    public void decrementAmmo(int position) {
+        mCharacter.ammo.get(position).amount -= 1;
+    }
+
+    public void equipAmmo(Item ammoToAdd) {
+        mCharacter.ammo.add(ammoToAdd);
+    }
+
+    public void unequipAmmo(int ammoToRemoveIndex) {
+        mCharacter.ammo.remove(ammoToRemoveIndex);
+    }
+
+    public void equipWeapon(Weapon weaponToAdd) {
+        mCharacter.weapons.add(weaponToAdd);
+    }
+
+    public void unequipWeapon(int weaponToRemoveIndex) {
+        mCharacter.weapons.remove(weaponToRemoveIndex);
+    }
+
+    public void createTestAmmo() {
+        if(mCharacter.ammo.size() > 0) return;
+        Item[] test_items = new Item[]{new Item(), new Item(), new Item()};
+        for(int i = 0; i < test_items.length; i++) {
+            test_items[i].amount = 1;
+            test_items[i].gold_value = 10*i;
+            test_items[i].desc = "A simple test ammo";
+            test_items[i].weight = 2*i;
+            test_items[i].name = String.format(Locale.getDefault(), "Test Ammo %d", i);
+            mCharacter.ammo.add(test_items[i]);
+        }
+    }
+
+    public void createTestWeapons() {
+        if(mCharacter.weapons.size() > 0) return;
+        Weapon[] test_weapons = new Weapon[]{new Weapon(), new Weapon(), new Weapon()};
+        for(int i = 0; i < test_weapons.length; i++) {
+            test_weapons[i].hit = i;
+            test_weapons[i].damages.add(new Damage(4*i,6*i,4+i, "piercing", i, "CON"));
+            test_weapons[i].isProficient = i % 2 == 0;
+            test_weapons[i].range = 5*i;
+            test_weapons[i].amount = 1;
+            test_weapons[i].gold_value = 10*i;
+            test_weapons[i].desc = "A simple test weapon";
+            test_weapons[i].weight = 2*i;
+            test_weapons[i].name = String.format(Locale.getDefault(), "Test Weapon %d", i);
+            mCharacter.weapons.add(test_weapons[i]);
+        }
     }
 
     /**
