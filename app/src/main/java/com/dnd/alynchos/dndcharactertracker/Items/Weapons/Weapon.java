@@ -43,7 +43,7 @@ public class Weapon extends Item {
                 .append(hit + hit_bonus)
                 .append(" ");
         for(Damage dam : damages) {
-            sb.append(dam).append("\n");
+            sb.append(dam);
         }
         sb.append(" at ")
                 .append(range)

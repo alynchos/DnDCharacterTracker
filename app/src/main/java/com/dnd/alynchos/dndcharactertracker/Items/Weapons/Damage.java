@@ -23,6 +23,6 @@ public class Damage {
 
     @Override
     public String toString(){
-        return dice_num + "d" + dice_size + " +" + flat_damage + " " + damage_type + (dc_save > 0 ? (" with DC " + dc_save + " " + dc_save_type + " save.") : ".");
+        return dice_num + "d" + dice_size + " +" + flat_damage + " " + damage_type + (dc_save > 0 ? (" with DC " + dc_save + " " + dc_save_type + " save") : "");
     }
 }
