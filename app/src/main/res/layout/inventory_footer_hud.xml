@@ -7,90 +7,38 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:id="@+id/inv_money_layout"
-        android:layout_alignParentLeft="true">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:id="@+id/inv_c_amount"
-            android:text=" "
-            android:textColor="@color/copper"
-            android:textStyle="bold"
-            android:textSize="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:id="@+id/inv_s_amount"
-            android:text=" "
-            android:textColor="@color/silver"
-            android:textSize="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:id="@+id/inv_e_amount"
-            android:text=" "
-            android:textColor="@color/electrum"
-            android:textStyle="bold"
-            android:textSize="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:id="@+id/inv_g_amount"
-            android:text=" "
-            android:textColor="@color/gold"
-            android:textStyle="bold"
-            android:textSize="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:id="@+id/inv_p_amount"
-            android:text=" "
-            android:textColor="@color/platinum"
-            android:textStyle="bold"
-            android:textSize="16dp"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:id="@+id/inv_carry_layout"
-        android:layout_alignParentRight="true">
+        android:layout_alignParentEnd="true">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:id="@+id/inv_carry_label"
-            android:text="Carry Weight"
+            android:text="@string/carry_weight"
             android:textColor="@color/black"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:textStyle="bold"
-            android:textSize="16dp"/>
+            android:textSize="@dimen/small_font"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:id="@+id/inv_carry_curr"
-            android:text="0"
+            android:text="@string/carry_weight_start"
             android:textColor="@color/black"
-            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
             android:textStyle="bold"
-            android:textSize="16dp"/>
+            android:textSize="@dimen/small_font"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:id="@+id/inv_carry_max"
-            android:text="/ 0"
+            android:text="@string/carry_weight_max"
             android:textColor="@color/black"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:textStyle="bold"
-            android:textSize="16dp"/>
+            android:textSize="@dimen/small_font"/>
 
     </LinearLayout>
 

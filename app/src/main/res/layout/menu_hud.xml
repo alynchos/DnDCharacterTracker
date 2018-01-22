@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:layout_gravity="center">
+
+    <LinearLayout
+        android:id="@+id/layout_hamburger_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:layout_gravity="center">
+        <ImageButton
+            android:id="@+id/but_hamburger_menu"
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_hamburger_menu32x32"
+            android:clickable="false"
+            android:scaleType="centerInside"
+            android:background="@null"
+            android:layout_marginStart="@dimen/large_padding"
+            android:layout_marginEnd="@dimen/large_padding"
+            android:contentDescription="@string/but_hamburger_menu"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center">
+        <TextView
+            android:id="@+id/text_screen_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_screen_title"
+            android:layout_gravity="end|center"
+            android:textSize="20sp"
+            android:textColor="@color/off_white"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:src="@android:drawable/ic_search_category_default"
+            android:padding="@dimen/default_padding"
+            android:layout_margin="0dp"
+            android:scaleType="fitCenter"
+            android:clickable="true"
+            android:layout_gravity="end|center"
+            android:contentDescription="@string/but_search" />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

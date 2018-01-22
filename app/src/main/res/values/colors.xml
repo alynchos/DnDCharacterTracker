@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Theme Colors -->
+    <color name="colorPrimary">#ff1d79b1</color>
+    <color name="colorPrimaryDark">#ff084d95</color>
+    <color name="colorAccent">#ff084d95</color>
+
+
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="off_white">#ffeeeeee</color>
     <color name="light_tan">#F0E0B2</color>
     <color name="tan">#CC9900</color>
     <color name="light_blue">#6699FF</color>

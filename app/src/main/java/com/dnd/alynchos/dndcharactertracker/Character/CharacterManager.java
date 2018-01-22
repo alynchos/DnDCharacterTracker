@@ -1,22 +1,29 @@
 package com.dnd.alynchos.dndcharactertracker.Character;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.util.Pair;
 import android.widget.Toast;
 
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
 import com.dnd.alynchos.dndcharactertracker.Items.Item;
+import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Damage;
 import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Weapon;
 import com.dnd.alynchos.dndcharactertracker.SaveData.FeedReaderDbHelper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Alex Lynchosky on 12/22/2014.
+ * The main character manager. Handles saving and retrieving data.
  */
 public class CharacterManager {
 
@@ -29,17 +36,25 @@ public class CharacterManager {
     public static final String UPDATE_INV_UI = "com.dnd.alynchos.UPDATE_INV_UI";
     public static final String CLEAR_CHAR = "com.dnd.alynchos.CLEAR_CHAR";
     public static final String CLEAR_INV = "com.dnd.alynchos.CLEAR_INV";
+    public static final String HIDE_KEYBOARD = "com.dnd.alynchos.HIDE_KEYBOARD";
+    public static final String SHOW_KEYBOARD = "com.dnd.alynchos.HIDE_KEYBOARD";
 
-    // Constants
-    public static final int ACR = 0, ANI = 1, ARC = 2, ATH = 3, DEC = 4, HIS = 5, INS = 6,
-            INTI = 7, INV = 8, MED = 9, NAT = 10, PER = 11, PERF = 12, PERS = 13,
-            REL = 14, SLE = 15, STE = 16, SUR = 17;
+    // Preferences
+    public static final String PREF_CHARACTER_UUID = "character_uuid";
+
+    public enum CurrencyType {
+        copper,
+        silver,
+        gold,
+        platinum
+    }
 
     // Keep track of level steps
     public static final int[] LEVEL_CAPS = {300, 900, 2700, 6500};
 
     private BaseCharacter mCharacter;
     static CharacterManager mCharacterManager;
+    private long mCurrentCharacterUUID = 1;
 
     public CharacterManager() {
         mCharacterManager = this;
@@ -49,6 +64,8 @@ public class CharacterManager {
         if (mCharacterManager == null) {
             mCharacterManager = new CharacterManager();
         }
+        if (mCharacterManager.mCharacter == null)
+            mCharacterManager.setCharacter(new BaseCharacter());
         return mCharacterManager;
     }
 
@@ -75,10 +92,6 @@ public class CharacterManager {
         mCharacter.chr = abilities[5];
     }
 
-    public void setAmmo(String name) {
-        mCharacter.ammo = name;
-    }
-
     public void setArmor(int armor) {
         mCharacter.armor = armor;
     }
@@ -95,18 +108,33 @@ public class CharacterManager {
         mCharacter.health = health;
     }
 
-    public void setIdentity(String identity[]) {
-        mCharacter.name = identity[0];
-        mCharacter.race = identity[1];
-        mCharacter.class_ = identity[2];
-        mCharacter.align = identity[3];
+    public void setAlignment(String val) {
+        mCharacter.align = val;
+    }
+
+    public void setBackground(String val) {
+        mCharacter.background = val;
+    }
+
+    public void setClass_(String val) {
+        mCharacter.class_ = val;
+    }
+
+    public void setName(String val) {
+        mCharacter.name = val;
+    }
+
+    public void setRace(String val) {
+        mCharacter.race = val;
     }
 
     public void setInitiative(int initiative) {
         mCharacter.initiative = initiative;
     }
 
-    public void setNotes(String set){mCharacter.notes = set;}
+    public void setNotes(String set) {
+        mCharacter.notes = set;
+    }
 
     public void setProficiency(int proficiency) {
         mCharacter.proficiency = proficiency;
@@ -117,9 +145,7 @@ public class CharacterManager {
             logger.debug("Incorrect saving throws array length: " + savingThrows.length);
             return;
         }
-        for (int i = 0; i < savingThrows.length; i++) {
-            mCharacter.saveProf[i] = savingThrows[i];
-        }
+        System.arraycopy(savingThrows, 0, mCharacter.saveProf, 0, savingThrows.length);
     }
 
     public void setSkillProf(BaseCharacter.Skill skill, int val) {
@@ -134,28 +160,24 @@ public class CharacterManager {
         mCharacter.speed = speed;
     }
 
-    public void setWeapon(String name, int atk_bns, int num) {
-        mCharacter.attack_bonus[num] = atk_bns;
-        mCharacter.weapons[num] = name;
-    }
-
     /**
      * *************************************************************
      * ***************** Public Getter Functions *********************
      * **************************************************************
      */
 
+    // UUID
+    public long getCharacterUUID() {
+        return mCurrentCharacterUUID;
+    }
+
     // Combat
     public int getArmor() {
         return mCharacter.armor;
     }
 
-    public String getAmmo() {
-        return mCharacter.ammo;
-    }
-
-    public int getAttackBonus(int num) {
-        return mCharacter.attack_bonus[num];
+    public Item[] getAmmo() {
+        return mCharacter.ammo.toArray(new Item[mCharacter.ammo.size()]);
     }
 
     public int getHealth() {
@@ -170,37 +192,47 @@ public class CharacterManager {
         return mCharacter.speed;
     }
 
-    public String getWeaponName(int num) {
-        return mCharacter.weapons[num];
+    public Item[] getEquipedAmmo() {
+        return mCharacter.ammo.toArray(new Item[mCharacter.ammo.size()]);
+    }
+
+    public Weapon[] getEquipedWeapons() {
+        return mCharacter.weapons.toArray(new Weapon[mCharacter.weapons.size()]);
     }
 
     public BaseCharacter getCharacter() {
+        if (mCharacter == null) mCharacter = new BaseCharacter();
         return mCharacter;
     }
 
     // Identity
     public String getName() {
-        if(mCharacter.name == null) mCharacter.name = " ";
+        if (mCharacter.name == null) mCharacter.name = " ";
         return mCharacter.name;
     }
 
     public String getRace() {
-        if(mCharacter.race == null) mCharacter.race = " ";
+        if (mCharacter.race == null) mCharacter.race = " ";
         return mCharacter.race;
     }
 
     public String getClass_() {
-        if(mCharacter.class_ == null) mCharacter.class_ = " ";
+        if (mCharacter.class_ == null) mCharacter.class_ = " ";
         return mCharacter.class_;
     }
 
     public String getAlign() {
-        if(mCharacter.align == null) mCharacter.align = " ";
+        if (mCharacter.align == null) mCharacter.align = " ";
         return mCharacter.align;
     }
 
-    public String getNotes(){
-        if(mCharacter.notes == null) mCharacter.notes = " ";
+    public String getBackground() {
+        if (mCharacter.background == null) mCharacter.background = " ";
+        return mCharacter.background;
+    }
+
+    public String getNotes() {
+        if (mCharacter.notes == null) mCharacter.notes = " ";
         return mCharacter.notes;
     }
 
@@ -318,73 +350,38 @@ public class CharacterManager {
         AsyncTask<Void, Void, Integer> task = (new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... voids) {
-                FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-                String table = FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY;
-                int array_size = 5;
-                Weapon weapon = new Weapon();
-                if (item instanceof Weapon) {
-                    logger.debug("New item is a weapon");
-                    weapon = (Weapon) item;
-                    array_size = 10;
-                }
-                String columns[] = new String[array_size];
-                Object data[] = new Object[array_size];
-                columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_NAME;
-                data[0] = item.name;
-                columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_AMOUNT;
-                data[1] = new Integer(item.amount);
-                columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_GOLD;
-                data[2] = new Double(item.gold_value);
-                columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEIGHT;
-                data[3] = new Double(item.weight);
-                columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DESC;
-                data[4] = item.desc;
-                if (array_size > 5) {
-                    columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DICE_NUM;
-                    data[5] = new Integer(weapon.dice_num);
-                    columns[6] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DICE_SIZE;
-                    data[6] = new Integer(weapon.dice_size);
-                    columns[7] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DAM_FLAT;
-                    data[7] = new Integer(weapon.flat_damage);
-                    columns[8] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_RANGE;
-                    data[8] = new Integer(weapon.range);
-                    columns[9] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DAM_TYPE;
-                    data[9] = weapon.damage_type;
-                }
-                feedReaderDbHelper.insertData(table, columns, data);
                 return 1;
             }
 
             @Override
             protected void onPostExecute(Integer count) {
-                return;
             }
         });
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    // (0 = copper, 1 = silver, 2 = electrum, 3 = gold, 4 = platinum)
-    public void addMoney(int amount, int type) {
-        double to_add = 0;
+    public void setCurrency(int amount, CurrencyType type) {
         switch (type) {
-            case 0:
-                to_add = (double) amount * (0.005);
+            case copper:
+                if (amount < 0) mCharacter.copper = 0;
+                else mCharacter.copper = amount;
                 break;
-            case 1:
-                to_add = (double) amount * (0.05);
+            case silver:
+                if (amount < 0) mCharacter.silver = 0;
+                else mCharacter.silver = amount;
                 break;
-            case 2:
-                to_add = (double) amount * (0.5);
+            case gold:
+                if (amount < 0) mCharacter.gold = 0;
+                else mCharacter.gold = amount;
                 break;
-            case 3:
-                to_add = (double) amount;
+            case platinum:
+                if (amount < 0) mCharacter.plat = 0;
+                else mCharacter.plat = amount;
                 break;
-            case 4:
-                to_add = (double) amount * (5);
+            default:
+                logger.error("Improper currency type: " + type);
                 break;
         }
-        if (mCharacter.gold + to_add < 0) mCharacter.gold = 0;
-        else mCharacter.gold += to_add;
     }
 
     public void deleteInventory() {
@@ -404,77 +401,27 @@ public class CharacterManager {
         return mCharacter.getCarryWeight();
     }
 
-    public int[] getCurrentMoney() {
-        int p = 0, g = 0, e = 0, s = 0, c = 0;
-        double money = mCharacter.gold;
-        while (money - 5 >= 0) {
-            money -= 5;
-            p++;
-        }
-        while (money - 1 >= 0) {
-            money--;
-            g++;
-        }
-        while (money - 0.5 >= 0) {
-            money -= 0.5;
-            e++;
-        }
-        while (money - 0.05 >= 0) {
-            money -= 0.05;
-            s++;
-        }
-        while (money - 0.005 >= 0) {
-            money -= 0.005;
-            c++;
-        }
-        return new int[]{c, s, e, g, p};
+    public int[] getCurrency() {
+        return new int[]{mCharacter.copper, mCharacter.silver, mCharacter.gold, mCharacter.plat};
     }
 
     public String[] getInventoryItemNames() {
         String names[] = new String[mCharacter.inventory.size()];
         String set[] = mCharacter.inventory.keySet().toArray(new String[names.length]);
-        for (int i = 0; i < names.length; i++) {
-            names[i] = set[i];
-        }
+        System.arraycopy(set, 0, names, 0, names.length);
         return names;
     }
 
-    // Return either the list of weapons, or the list of everything except weapons
-    public String[] getInventoryWeaponNames(boolean wantWeapons) {
+    public Weapon[] getInventoryWeapons() {
         LinkedList<Weapon> weapons = new LinkedList<>();
-        LinkedList<Item> items = new LinkedList<>();
-        Item list[] = mCharacter.inventory.values().toArray(new Item[mCharacter.inventory.size()]);
+        Item[] list = mCharacter.inventory.values().toArray(new Item[mCharacter.inventory.size()]);
         // Find the weapons
-        for (int i = 0; i < list.length; i++) {
-            if(list[i] instanceof Weapon){
-                if (wantWeapons) {
-                    weapons.add((Weapon)list[i]);
-                } else {
-                    continue;
-                }
-            }
-            else{
-                if (wantWeapons) {
-                    continue;
-                } else {
-                    items.add(list[i]);
-                }
+        for (Item item : list) {
+            if (item instanceof Weapon) {
+                weapons.add((Weapon) item);
             }
         }
-        String names[];
-        if(wantWeapons){
-            names = new String[weapons.size()];
-            for (int i = 0; i < names.length; i++) {
-                names[i] = weapons.get(i).name;
-            }
-        }
-        else{
-            names = new String[items.size()];
-            for (int i = 0; i < names.length; i++) {
-                names[i] = items.get(i).name;
-            }
-        }
-        return names;
+        return weapons.toArray(new Weapon[weapons.size()]);
     }
 
 
@@ -485,6 +432,60 @@ public class CharacterManager {
     public void modItem(String name, Item item) {
         modifyItemDatabase(name, item);
         mCharacter.modItem(name, item);
+    }
+
+    public void incrementAmmo(int position) {
+        mCharacter.ammo.get(position).amount += 1;
+    }
+
+    public void decrementAmmo(int position) {
+        mCharacter.ammo.get(position).amount -= 1;
+    }
+
+    public void equipAmmo(Item ammoToAdd) {
+        mCharacter.ammo.add(ammoToAdd);
+    }
+
+    public void unequipAmmo(int ammoToRemoveIndex) {
+        mCharacter.ammo.remove(ammoToRemoveIndex);
+    }
+
+    public void equipWeapon(Weapon weaponToAdd) {
+        mCharacter.weapons.add(weaponToAdd);
+    }
+
+    public void unequipWeapon(int weaponToRemoveIndex) {
+        mCharacter.weapons.remove(weaponToRemoveIndex);
+    }
+
+    public void createTestAmmo() {
+        if(mCharacter.ammo.size() > 0) return;
+        Item[] test_items = new Item[]{new Item(), new Item(), new Item()};
+        for(int i = 0; i < test_items.length; i++) {
+            test_items[i].amount = 1;
+            test_items[i].gold_value = 10*i;
+            test_items[i].desc = "A simple test ammo";
+            test_items[i].weight = 2*i;
+            test_items[i].name = String.format(Locale.getDefault(), "Test Ammo %d", i);
+            mCharacter.ammo.add(test_items[i]);
+        }
+    }
+
+    public void createTestWeapons() {
+        if(mCharacter.weapons.size() > 0) return;
+        Weapon[] test_weapons = new Weapon[]{new Weapon(), new Weapon(), new Weapon()};
+        for(int i = 0; i < test_weapons.length; i++) {
+            test_weapons[i].hit = i;
+            test_weapons[i].damages.add(new Damage(4*i,6*i,4+i, "piercing", i, "CON"));
+            test_weapons[i].isProficient = i % 2 == 0;
+            test_weapons[i].range = 5*i;
+            test_weapons[i].amount = 1;
+            test_weapons[i].gold_value = 10*i;
+            test_weapons[i].desc = "A simple test weapon";
+            test_weapons[i].weight = 2*i;
+            test_weapons[i].name = String.format(Locale.getDefault(), "Test Weapon %d", i);
+            mCharacter.weapons.add(test_weapons[i]);
+        }
     }
 
     /**
@@ -499,7 +500,9 @@ public class CharacterManager {
             @Override
             protected Integer doInBackground(Void... voids) {
                 FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-                feedReaderDbHelper.deleteItemData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, name);
+                assert feedReaderDbHelper != null;
+                //TODO: DELETE ITEM
+                //feedReaderDbHelper.deleteItemData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, name);
                 return 1;
             }
 
@@ -515,41 +518,6 @@ public class CharacterManager {
         AsyncTask<Void, Void, Integer> task = (new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... voids) {
-                FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-                int array_length;
-                if (item instanceof Weapon) {
-                    array_length = 10;
-                } else {
-                    array_length = 5;
-                }
-                Object data[] = new Object[array_length];
-                String columns[] = new String[array_length];
-                columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEIGHT;
-                data[0] = new Double(item.weight);
-                columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_GOLD;
-                data[1] = new Double(item.gold_value);
-                columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DESC;
-                data[2] = item.desc;
-                columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_NAME;
-                data[3] = item.name;
-                columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_AMOUNT;
-                data[4] = new Integer(item.amount);
-                if (array_length > 5) {
-                    Weapon weapon = (Weapon) item;
-                    columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DICE_NUM;
-                    data[5] = new Integer(weapon.dice_num);
-                    columns[6] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DICE_SIZE;
-                    data[6] = new Integer(weapon.dice_size);
-                    columns[7] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DAM_FLAT;
-                    data[7] = new Integer(weapon.flat_damage);
-                    columns[8] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_RANGE;
-                    data[8] = new Integer(weapon.range);
-                    columns[9] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_DAM_TYPE;
-                    data[9] = weapon.damage_type;
-                }
-                String whereColumns[] = new String[]{FeedReaderDbHelper.FeedEntry.COLUMN_INV_NAME};
-                Object whereArgs[] = new Object[]{name};
-                feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, columns, data, whereColumns, whereArgs);
                 return 1;
             }
 
@@ -562,16 +530,18 @@ public class CharacterManager {
     }
 
     public void syncWithDatabase(final Activity mActivity) {
-        AsyncTask<Void, Void, Integer> task = (new AsyncTask<Void, Void, Integer>() {
+        AsyncTask<Void, Void, Long> task = (new AsyncTask<Void, Void, Long>() {
             @Override
-            protected Integer doInBackground(Void... voids) {
-                syncCharacterData();
-                syncInventoryData();
-                return 1;
+            protected Long doInBackground(Void... voids) {
+                mCurrentCharacterUUID = mActivity
+                        .getPreferences(Context.MODE_PRIVATE)
+                        .getLong(PREF_CHARACTER_UUID, 1);
+                logger.debug("Character UUID Retrieved: " + mCurrentCharacterUUID);
+                return syncCharacterData(mCurrentCharacterUUID);
             }
 
             @Override
-            protected void onPostExecute(Integer count) {
+            protected void onPostExecute(Long uuid) {
                 Intent intent = new Intent();
                 intent.setAction(UPDATE_UI);
                 mActivity.sendBroadcast(intent);
@@ -581,424 +551,85 @@ public class CharacterManager {
     }
 
     public void saveData(final Activity mActivity) {
-        AsyncTask<Void, Void, Integer> task = (new AsyncTask<Void, Void, Integer>() {
+        AsyncTask<Void, Void, Long> task = (new AsyncTask<Void, Void, Long>() {
             @Override
-            protected Integer doInBackground(Void... voids) {
-                saveAbilities();
-                saveCombat();
-                saveExperience();
-                saveGold();
-                saveIdentity();
-                saveNotes();
-                saveProficiency();
-                saveSavingThrows();
-                saveSkillProf();
-                return 1;
+            protected Long doInBackground(Void... voids) {
+                return saveCharacter(mCurrentCharacterUUID);
             }
 
             @Override
-            protected void onPostExecute(Integer count) {
+            protected void onPostExecute(Long uuid) {
+                logger.debug("Character saved with uuid: " + uuid);
+                mCurrentCharacterUUID = uuid;
+                mActivity.getPreferences(Context.MODE_PRIVATE)
+                        .edit()
+                        .putLong(PREF_CHARACTER_UUID, mCurrentCharacterUUID)
+                        .apply();
                 Toast.makeText(mActivity, "Data Saved", Toast.LENGTH_SHORT).show();
             }
         });
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    // Syncs all the character data
-    private void syncCharacterData() {
+    private long saveCharacter(long character_uuid) {
+        Gson gson = new Gson();
+        Type type = new TypeToken<BaseCharacter>() {
+        }.getType();
+        String json = gson.toJson(mCharacter, type);
+        logger.debug("Saving character[" + character_uuid + "]: " + json);
         FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Cursor retrieve;
-        String columns[];
-        // Identity
-        columns = new String[4];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_NAME;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_RACE;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_CLASS;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_ALIGN;
-        retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns);
-        retrieve.moveToFirst();
-        mCharacter.name = retrieve.getString(0);
-        mCharacter.race = retrieve.getString(1);
-        mCharacter.class_ = retrieve.getString(2);
-        mCharacter.align = retrieve.getString(3);
-        logger.debug("DB Identity: " + mCharacter.name + " " + mCharacter.race + " " + mCharacter.class_ + " " + mCharacter.align);
-        // Abilities
-        columns = new String[6];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_STR;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_DEX;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_CON;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_INT;
-        columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_WIS;
-        columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_CHR;
-        retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns);
-        retrieve.moveToFirst();
-        mCharacter.str = retrieve.getInt(0);
-        mCharacter.dex = retrieve.getInt(1);
-        mCharacter.con = retrieve.getInt(2);
-        mCharacter.intel = retrieve.getInt(3);
-        mCharacter.wis = retrieve.getInt(4);
-        mCharacter.chr = retrieve.getInt(5);
-        logger.debug("DB Abilities: "
-                + mCharacter.str + " "
-                + mCharacter.dex + " "
-                + mCharacter.con + " "
-                + mCharacter.intel + " "
-                + mCharacter.wis + " "
-                + mCharacter.chr);
-        // Skills
-        columns = new String[18];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_ACR;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_ANI;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_ARC;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_ATH;
-        columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_DEC;
-        columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_HIS;
-        columns[6] = FeedReaderDbHelper.FeedEntry.COLUMN_INS;
-        columns[7] = FeedReaderDbHelper.FeedEntry.COLUMN_INTI;
-        columns[8] = FeedReaderDbHelper.FeedEntry.COLUMN_INV;
-        columns[9] = FeedReaderDbHelper.FeedEntry.COLUMN_MED;
-        columns[10] = FeedReaderDbHelper.FeedEntry.COLUMN_NAT;
-        columns[11] = FeedReaderDbHelper.FeedEntry.COLUMN_PER;
-        columns[12] = FeedReaderDbHelper.FeedEntry.COLUMN_PERF;
-        columns[13] = FeedReaderDbHelper.FeedEntry.COLUMN_PERS;
-        columns[14] = FeedReaderDbHelper.FeedEntry.COLUMN_REL;
-        columns[15] = FeedReaderDbHelper.FeedEntry.COLUMN_SLE;
-        columns[16] = FeedReaderDbHelper.FeedEntry.COLUMN_STE;
-        columns[17] = FeedReaderDbHelper.FeedEntry.COLUMN_SUR;
-        retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns);
-        retrieve.moveToFirst();
-        String debug = "DB Skill Profs: ";
-        for (int i = 0; i < mCharacter.skillProf.length; i++) {
-            mCharacter.skillProf[i] = retrieve.getInt(i);
-            debug += mCharacter.skillProf[i] + " ";
-        }
-        logger.debug(debug);
-        // Saving Throws
-        columns = new String[6];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_STR;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_DEX;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_CON;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_INT;
-        columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_WIS;
-        columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_CHR;
-        retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns);
-        retrieve.moveToFirst();
-        debug = "DB Saving Throws: ";
-        for (int i = 0; i < mCharacter.saveProf.length; i++) {
-            mCharacter.saveProf[i] = retrieve.getInt(i);
-            debug += mCharacter.saveProf[i] + " ";
-        }
-        logger.debug(debug);
-        // Proficiency
-        columns = new String[1];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_PROFICIENCY;
-        retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns);
-        retrieve.moveToFirst();
-        mCharacter.proficiency = retrieve.getInt(0);
-        logger.debug("DB Proficiency: " + mCharacter.proficiency);
-        // Experience
-        columns = new String[1];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_EXPERIENCE;
-        retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns);
-        retrieve.moveToFirst();
-        mCharacter.experience = retrieve.getInt(0);
-        logger.debug("DB Experience: " + mCharacter.experience);
-        // Combat
-        columns = new String[4];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_HEALTH;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_ARMOR;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_INITIATIVE;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_SPEED;
-        retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns);
-        retrieve.moveToFirst();
-        mCharacter.health = retrieve.getInt(0);
-        mCharacter.armor = retrieve.getInt(1);
-        mCharacter.initiative = retrieve.getInt(2);
-        mCharacter.speed = retrieve.getInt(3);
-        columns = new String[7];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_ATTACK_BNS1;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_ATTACK_BNS2;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_ATTACK_BNS3;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPON1;
-        columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPON2;
-        columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPON3;
-        columns[6] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_AMMO;
-        retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, columns);
-        retrieve.moveToFirst();
+        assert feedReaderDbHelper != null;
+        Object save[] = new Object[]{json};
+        String[] where_columns = new String[]{FeedReaderDbHelper.FeedEntry._ID};
+        Object[] where_args = new Object[]{character_uuid};
+        // Check to see if the character exists in the database, if not, create a new one
         try {
-            for (int i = 0; i < 3; i++) {
-                mCharacter.attack_bonus[i] = retrieve.getInt(i);
-            }
-            for (int i = 3; i < 6; i++) {
-                mCharacter.weapons[i - 3] = retrieve.getString(i);
-            }
-            mCharacter.ammo = retrieve.getString(6);
+            Cursor queryData = feedReaderDbHelper.queryData(
+                    FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER,
+                    new String[]{FeedReaderDbHelper.FeedEntry.COLUMN_CHARACTER},
+                    (FeedReaderDbHelper.FeedEntry._ID + " = ?"),
+                    new String[]{"" + character_uuid});
+            queryData.moveToFirst();
+            logger.debug("Previous instance found, overwriting character[" + character_uuid + "]: " + queryData.getString(0));
+            feedReaderDbHelper.updateData(
+                    FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER,
+                    new String[]{FeedReaderDbHelper.FeedEntry.COLUMN_CHARACTER},
+                    save,
+                    where_columns,
+                    where_args);
         } catch (Exception e) {
-            logger.error("There are no items in inventory yet!");
+            e.printStackTrace();
+            logger.debug("Character[" + character_uuid + "] does not exist, creating new entry.");
+            return feedReaderDbHelper.addRow(
+                    FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER,
+                    new String[]{FeedReaderDbHelper.FeedEntry.COLUMN_CHARACTER},
+                    save);
         }
-        logger.debug("DB Health: " + mCharacter.health + " Armor: " + mCharacter.armor + " Ini: " +
-                mCharacter.initiative + " Speed: " + mCharacter.speed + " AtkBns: +" + mCharacter.attack_bonus[0] +
-                " +" + mCharacter.attack_bonus[1] + " +" + mCharacter.attack_bonus[2] + " Weapons: " +
-                mCharacter.weapons[0] + " " + mCharacter.weapons[1] + mCharacter.weapons[2] + " Ammo: " +
-                mCharacter.ammo);
-        // Gold
-        columns = new String[1];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_GOLD;
-        retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns);
-        retrieve.moveToFirst();
-        mCharacter.gold = retrieve.getDouble(0);
-        logger.debug("DB Gold: " + mCharacter.gold);
-        // Notes
-        columns = new String[1];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_NOTES;
-        retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, columns);
-        retrieve.moveToFirst();
+        return character_uuid;
+    }
+
+    // Syncs all the character data
+    private long syncCharacterData(long character_uuid) {
+        FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
+        assert feedReaderDbHelper != null;
         try {
-            mCharacter.notes = retrieve.getString(0);
-            logger.debug("DB Notes: " + mCharacter.notes);
+            Cursor retrieve = feedReaderDbHelper.queryData(
+                    FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER,
+                    new String[]{FeedReaderDbHelper.FeedEntry.COLUMN_CHARACTER},
+                    (FeedReaderDbHelper.FeedEntry._ID + " = ?"),
+                    new String[]{"" + character_uuid});
+            retrieve.moveToFirst();
+            Gson gson = new Gson();
+            Type type = new TypeToken<BaseCharacter>() {
+            }.getType();
+            String json = retrieve.getString(0);
+            logger.debug("Loading character[" + character_uuid + "]: " + json);
+            mCharacter = gson.fromJson(json, type);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Unable to retrieve character[" + character_uuid + "] from database!");
         }
-        catch(Exception e){
-            logger.error("There are no notes yet!");
-        }
-    }
-
-    // Syncs all the inventory data
-    private void syncInventoryData() {
-        FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Cursor retrieve;
-        String columns[] = new String[]{"*"};
-        retrieve = feedReaderDbHelper.queryData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, columns);
-        LinkedList<Item> item_list = new LinkedList<Item>();
-        while (retrieve.moveToNext()) {
-            Item curr = new Item();
-            try {
-                curr.weight = retrieve.getDouble(1);
-            } catch (Exception e) {
-                logger.debug("Failed retrieving weight");
-                curr.weight = 0;
-            }
-            try {
-                curr.gold_value = retrieve.getDouble(2);
-            } catch (Exception e) {
-                logger.debug("Failed retrieving gold");
-                curr.gold_value = 0;
-            }
-            try {
-                curr.desc = retrieve.getString(3);
-            } catch (Exception e) {
-                logger.debug("Failed retrieving desc");
-                curr.desc = " ";
-            }
-            try {
-                curr.name = retrieve.getString(4);
-            } catch (Exception e) {
-                logger.debug("Failed retrieving name");
-                curr.name = " ";
-            }
-            try {
-                curr.amount = retrieve.getInt(5);
-            } catch (Exception e) {
-                logger.debug("Failed retrieving amount");
-                curr.amount = 0;
-            }
-            boolean isWeapon = false;
-            Weapon weapon = new Weapon(curr);
-            try {
-                weapon.dice_num = retrieve.getInt(6);
-                isWeapon = true;
-                if (weapon.dice_num == 0) {
-                    isWeapon = false;
-                }
-            } catch (Exception e) {
-                logger.debug("Failed retrieving dice_num");
-                isWeapon = false;
-            }
-            if (isWeapon) {
-                try {
-                    weapon.dice_size = retrieve.getInt(7);
-                } catch (Exception e) {
-                    logger.debug("Failed retrieving dice_size");
-                    weapon.dice_size = 0;
-                }
-                try {
-                    weapon.flat_damage = retrieve.getInt(8);
-                } catch (Exception e) {
-                    logger.debug("Failed retrieving flat damage");
-                    weapon.flat_damage = 0;
-                }
-                try {
-                    weapon.range = retrieve.getInt(9);
-                } catch (Exception e) {
-                    logger.debug("Failed retrieving range");
-                    weapon.range = 0;
-                }
-                try {
-                    weapon.damage_type = retrieve.getString(10);
-                } catch (Exception e) {
-                    logger.debug("Failed retrieving damage type");
-                    weapon.damage_type = " ";
-                }
-                logger.debug(weapon.toString());
-                item_list.add(weapon);
-            } else {
-                logger.debug(curr.toString());
-                item_list.add(curr);
-            }
-        }
-        for (int i = 0; i < item_list.size(); i++) {
-            mCharacter.inventory.put(item_list.get(i).name, item_list.get(i));
-        }
-    }
-
-    private void saveAbilities() {
-        FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Object save[] = new Object[6];
-        save[0] = new Integer(mCharacter.str);
-        save[1] = new Integer(mCharacter.dex);
-        save[2] = new Integer(mCharacter.con);
-        save[3] = new Integer(mCharacter.intel);
-        save[4] = new Integer(mCharacter.wis);
-        save[5] = new Integer(mCharacter.chr);
-        String columns[] = new String[6];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_STR;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_DEX;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_CON;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_INT;
-        columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_WIS;
-        columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_CHR;
-        feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
-    }
-
-    private void saveCombat() {
-        FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Object save[] = new Object[4];
-        save[0] = new Integer(mCharacter.health);
-        save[1] = new Integer(mCharacter.armor);
-        save[2] = new Integer(mCharacter.initiative);
-        save[3] = new Integer(mCharacter.speed);
-        String columns[] = new String[4];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_HEALTH;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_ARMOR;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_INITIATIVE;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_SPEED;
-        feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
-        save = new Object[7];
-        for (int i = 0; i < 3; i++) {
-            save[i] = new Integer(mCharacter.attack_bonus[i]);
-        }
-        save[3] = mCharacter.weapons[0];
-        save[4] = mCharacter.weapons[1];
-        save[5] = mCharacter.weapons[2];
-        save[6] = mCharacter.ammo;
-        columns = new String[7];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_ATTACK_BNS1;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_ATTACK_BNS2;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_ATTACK_BNS3;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPON1;
-        columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPON2;
-        columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_WEAPON3;
-        columns[6] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_AMMO;
-        feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, columns, save);
-    }
-
-    private void saveExperience() {
-        FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Object save[] = new Object[1];
-        save[0] = new Integer(mCharacter.experience);
-        String columns[] = new String[1];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_EXPERIENCE;
-        feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
-    }
-
-    private void saveGold() {
-        FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Object save[] = new Object[1];
-        save[0] = new Double(mCharacter.gold);
-        String columns[] = new String[1];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_GOLD;
-        feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
-    }
-
-    private void saveIdentity() {
-        FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Object save[] = new Object[4];
-        save[0] = mCharacter.name;
-        save[1] = mCharacter.race;
-        save[2] = mCharacter.class_;
-        save[3] = mCharacter.align;
-        String columns[] = new String[4];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_NAME;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_RACE;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_CLASS;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_ALIGN;
-        feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
-    }
-
-    private void saveNotes() {
-        FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Object save[] = new Object[1];
-        if(mCharacter.notes == null){
-            save[0] = new String(" ");
-        }
-        else{
-            save[0] = mCharacter.notes;
-        }
-        String columns[] = new String[1];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_INV_NOTES;
-        feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_INVENTORY, columns, save);
-    }
-
-    private void saveProficiency() {
-        FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Object save[] = new Object[1];
-        save[0] = new Integer(mCharacter.proficiency);
-        String columns[] = new String[1];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_PROFICIENCY;
-        feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
-    }
-
-    private void saveSavingThrows() {
-        FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Object save[] = new Object[6];
-        for (int i = 0; i < save.length; i++) {
-            save[i] = new Integer(mCharacter.saveProf[i]);
-        }
-        String columns[] = new String[6];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_STR;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_DEX;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_CON;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_INT;
-        columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_WIS;
-        columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_SAVE_CHR;
-        feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
-    }
-
-    private void saveSkillProf() {
-        FeedReaderDbHelper feedReaderDbHelper = FeedReaderDbHelper.getInstance();
-        Object save[] = new Object[18];
-        for (int i = 0; i < save.length; i++) {
-            save[i] = new Integer(mCharacter.skillProf[i]);
-        }
-        String columns[] = new String[18];
-        columns[0] = FeedReaderDbHelper.FeedEntry.COLUMN_ACR;
-        columns[1] = FeedReaderDbHelper.FeedEntry.COLUMN_ANI;
-        columns[2] = FeedReaderDbHelper.FeedEntry.COLUMN_ARC;
-        columns[3] = FeedReaderDbHelper.FeedEntry.COLUMN_ATH;
-        columns[4] = FeedReaderDbHelper.FeedEntry.COLUMN_DEC;
-        columns[5] = FeedReaderDbHelper.FeedEntry.COLUMN_HIS;
-        columns[6] = FeedReaderDbHelper.FeedEntry.COLUMN_INS;
-        columns[7] = FeedReaderDbHelper.FeedEntry.COLUMN_INTI;
-        columns[8] = FeedReaderDbHelper.FeedEntry.COLUMN_INV;
-        columns[9] = FeedReaderDbHelper.FeedEntry.COLUMN_MED;
-        columns[10] = FeedReaderDbHelper.FeedEntry.COLUMN_NAT;
-        columns[11] = FeedReaderDbHelper.FeedEntry.COLUMN_PER;
-        columns[12] = FeedReaderDbHelper.FeedEntry.COLUMN_PERF;
-        columns[13] = FeedReaderDbHelper.FeedEntry.COLUMN_PERS;
-        columns[14] = FeedReaderDbHelper.FeedEntry.COLUMN_REL;
-        columns[15] = FeedReaderDbHelper.FeedEntry.COLUMN_SLE;
-        columns[16] = FeedReaderDbHelper.FeedEntry.COLUMN_STE;
-        columns[17] = FeedReaderDbHelper.FeedEntry.COLUMN_SUR;
-        feedReaderDbHelper.updateData(FeedReaderDbHelper.FeedEntry.TABLE_CHARACTER, columns, save);
+        return mCurrentCharacterUUID;
     }
 
 }

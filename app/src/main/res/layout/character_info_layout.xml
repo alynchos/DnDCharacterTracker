@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/layout_level_display"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/level_display_size_buffer">
+
+        <include layout="@layout/level_display"
+            android:id="@+id/include_level_display"
+            android:layout_width="@dimen/level_display_size"
+            android:layout_height="@dimen/level_display_size"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/default_padding"
+            android:layout_marginBottom="@dimen/default_padding"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/but_modify_character_identity"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@android:drawable/ic_menu_add"
+            app:elevation="4dp"
+            android:scaleType="center"
+            android:layout_toEndOf="@id/include_level_display"
+            android:clickable="false"
+            android:visibility="gone"
+            app:backgroundTint="@null"
+            android:layout_alignBottom="@id/include_level_display"
+            android:layout_marginBottom="@dimen/default_padding"
+            android:layout_marginStart="@dimen/default_padding"
+            android:layout_marginEnd="@dimen/large_padding"
+            android:contentDescription="@string/but_modify_character_identity"/>
+
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/text_character_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_character_name"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/layout_level_display"
+        android:textSize="@dimen/very_large_font"
+        android:paddingStart="@dimen/default_padding"
+        android:paddingEnd="@dimen/default_padding"/>
+
+    <View
+        android:id="@+id/view_center_divide"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/text_character_name"
+        android:layout_width="1dp"
+        android:layout_height="1dp"/>
+
+    <TextView
+        android:id="@+id/text_character_race"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_character_race"
+        android:layout_toStartOf="@id/view_center_divide"
+        android:layout_below="@id/text_character_name"
+        android:textSize="@dimen/small_font"
+        android:paddingStart="@dimen/default_padding"
+        android:paddingEnd="@dimen/default_padding"/>
+
+    <TextView
+        android:id="@+id/text_character_class"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_character_class"
+        android:layout_centerHorizontal="true"
+        android:layout_toEndOf="@id/view_center_divide"
+        android:layout_below="@id/text_character_name"
+        android:textSize="@dimen/small_font"
+        android:paddingStart="@dimen/default_padding"
+        android:paddingEnd="@dimen/very_large_padding"/>
+
+
+    <TextView
+        android:id="@+id/text_character_alignment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_character_alignment"
+        android:textSize="@dimen/medium_font"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/text_character_race"
+        android:paddingTop="@dimen/default_padding"
+        android:paddingStart="@dimen/large_padding"
+        android:paddingEnd="@dimen/default_padding"/>
+
+    <TextView
+        android:id="@+id/text_character_background"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_character_background"
+        android:textSize="@dimen/medium_font"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/text_character_race"
+        android:paddingTop="@dimen/default_padding"
+        android:paddingStart="@dimen/default_padding"
+        android:paddingEnd="@dimen/large_padding"/>
+
+    <include layout="@layout/currency_layout"
+        android:id="@+id/include_currency_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text_character_alignment"
+        android:layout_alignParentEnd="true"
+        android:paddingTop="@dimen/very_large_padding"
+        android:paddingStart="@dimen/default_padding"
+        android:paddingEnd="@dimen/very_large_padding"/>
+
+
+</RelativeLayout>

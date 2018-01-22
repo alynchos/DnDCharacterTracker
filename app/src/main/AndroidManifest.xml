@@ -4,7 +4,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/logo_filled"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
@@ -21,31 +21,6 @@
             android:name=".DnDTabBarActivity"
             android:label="DnDTabBarActivity"
             android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".Character.CharacterSheetActivity"
-            android:label="@string/title_activity_character_sheet"
-            android:screenOrientation="portrait" >
-            <intent-filter>
-                <action android:name="com.dnd.alynchos.UPDATE_UI" />
-                <action android:name="com.dnd.alynchos.CLEAR_CHAR" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".Items.InventoryActivity"
-            android:label="@string/title_activity_inventory" >
-            <intent-filter>
-                <action android:name="com.dnd.alynchos.UPDATE_INV_UI" />
-                <action android:name="com.dnd.alynchos.CLEAR_INV" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".Character.CombatActivity"
-            android:label="@string/title_activity_combat" >
-        </activity>
-        <activity
-            android:name=".Character.NotesActivity"
-            android:label="@string/title_activity_notes" >
         </activity>
     </application>
 

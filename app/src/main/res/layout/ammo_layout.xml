@@ -1,41 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:background="@color/light_grey">
+    android:background="@color/light_grey"
+    android:gravity="center_vertical"
+    android:layout_margin="@dimen/default_padding"
+    android:paddingStart="@dimen/minimum_padding"
+    android:paddingEnd="@dimen/default_padding"
+    android:weightSum="10">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/text_ammo"
-        android:text="Ammo"
-        android:textStyle="bold"
-        android:textSize="20dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="2dp"
-        android:layout_marginTop="6dp"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/value_ammo"
-        android:text="empty"
-        android:layout_toRightOf="@+id/text_ammo"
-        android:layout_alignBottom="@+id/text_ammo"
-        android:layout_marginLeft="8dp"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/type_ammo"
-        android:text="none"
-        android:layout_toRightOf="@+id/value_ammo"
-        android:layout_alignBottom="@+id/text_ammo"
-        android:layout_marginLeft="8dp"/>
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:id="@+id/button_modify_ammo"
-        android:text="Modify"
-        android:textSize="12dp"
-        android:layout_alignParentRight="true"/>
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/default_padding"
+        android:minWidth="@dimen/small_image"
+        android:id="@+id/button_subtract_ammo"
+        android:text="@string/text_minus"
+        android:paddingStart="@dimen/large_padding"
+        android:paddingEnd="@dimen/large_padding"
+        android:textSize="@dimen/medium_font"
+        android:layout_weight="1.25"/>
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/minimum_padding"
+        android:minWidth="@dimen/small_image"
+        android:id="@+id/button_add_ammo"
+        android:text="@string/text_plus"
+        android:paddingStart="@dimen/large_padding"
+        android:paddingEnd="@dimen/large_padding"
+        android:textSize="@dimen/medium_font"
+        android:layout_weight="1.25"/>
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/text_ammo_amount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/default_padding"
+        android:paddingEnd="@dimen/default_padding"
+        android:text="@string/text_empty"
+        android:layout_weight="1"/>
+    <TextView
+        android:id="@+id/text_ammo_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/default_padding"
+        android:paddingEnd="@dimen/default_padding"
+        android:text="@string/text_none"
+        android:layout_weight="5.5"/>
+
+    <ImageButton
+        android:id="@+id/but_remove_equipped_ammo"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@null"
+        android:src="@android:drawable/ic_delete"
+        android:contentDescription="@string/text_remove_equipped_weapon" />
+
+</LinearLayout>

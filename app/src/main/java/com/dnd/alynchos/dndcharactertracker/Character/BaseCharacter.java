@@ -2,11 +2,15 @@ package com.dnd.alynchos.dndcharactertracker.Character;
 
 import com.dnd.alynchos.dndcharactertracker.Debug.Logger;
 import com.dnd.alynchos.dndcharactertracker.Items.Item;
+import com.dnd.alynchos.dndcharactertracker.Items.Weapons.Weapon;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Alex Lynchosky on 12/22/2014.
+ * The core class for building a character
  */
 public class BaseCharacter {
 
@@ -18,13 +22,13 @@ public class BaseCharacter {
     public String race = " ";
     public String class_ = " ";
     public String align = " ";
+    public String background = " ";
     public int age;
     public int health, armor, initiative, speed;
-    public int attack_bonus[] = new int[3];
-    public String weapons[] = new String[3];
-    public String ammo;
+    public List<Weapon> weapons = new LinkedList<>();
+    public List<Item> ammo = new LinkedList<>();
     public int str, dex, con, intel, wis, chr;
-    public double gold;
+    public int plat, gold, silver, copper;
     public int experience, level = 1;
     public int proficiency;
     public String personality_traits, ideals, bonds, flaws;
@@ -34,7 +38,6 @@ public class BaseCharacter {
     public int saveProf[] = {0, 0, 0, 0, 0, 0}; /* How proficient the character is in each saving throw (size 6)*/
     public int skillProf[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; /* How proficient the character is in each skill (size 18) */
 
-    private final int STRENGTH = 0, DEXTERITY = 1, CONSTITUTION = 2, INTELLIGENCE = 3, WISDOM = 4, CHARISMA = 5;
     private final int CARRY_COEF = 15;
 
     public enum Stat {
@@ -124,6 +127,10 @@ public class BaseCharacter {
         return total;
     }
 
+    public HashMap<String, Item> getInventory() {
+        return inventory;
+    }
+
     public Item getItem(String name){
         Item item = inventory.get(name);
         if(item == null){
@@ -173,22 +180,22 @@ public class BaseCharacter {
         int index = 0;
         switch (ability) {
             case Strength:
-                index = STRENGTH;
+                index = 0;
                 break;
             case Dexterity:
-                index = DEXTERITY;
+                index = 1;
                 break;
             case Constitution:
-                index = CONSTITUTION;
+                index = 2;
                 break;
             case Intelligence:
-                index = INTELLIGENCE;
+                index = 3;
                 break;
             case Wisdom:
-                index = WISDOM;
+                index = 4;
                 break;
             case Charisma:
-                index = CHARISMA;
+                index = 5;
                 break;
         }
         return index;
